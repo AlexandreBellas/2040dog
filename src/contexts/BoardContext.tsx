@@ -1,9 +1,23 @@
 import { IBoard } from '@interfaces/board'
 import { IPosition } from '@interfaces/position'
-import { ITile } from '@interfaces/tile'
 import React, { createContext, useContext, useReducer } from 'react'
 
+// #region Constant variables
+const boardLength = 4
+// #endregion
+
 // #region Functions
+function createNewBoard() {
+  return {
+    tiles: Array(boardLength).fill(
+      Array(boardLength).fill({
+        value: null,
+        isCombined: false,
+      }),
+    ),
+  } as IBoard
+}
+
 function listEmptySpots(board: IBoard) {
   const { tiles } = board
   const emptySpots: IPosition[] = []
@@ -77,6 +91,9 @@ type IBoardContextAction =
   | {
       type: 'insert'
     }
+  | {
+      type: 'restart'
+    }
 // #endregion
 
 // #region Context definitions
@@ -86,7 +103,7 @@ export const BoardContextDispatch = createContext(
 )
 // #endregion
 
-// #region Hooks definitions
+// #region Hook definitions
 export function useBoard() {
   return useContext(BoardContext)
 }
@@ -100,14 +117,12 @@ export function useBoardHelpers() {
 }
 // #endregion
 
-// #region Provider definition
+// #region Provider definitions
 export function BoardProvider({ children }: Readonly<IBoardProviderProps>) {
-  const initialTile: ITile = { value: null, isCombined: false }
-  const initialRow: ITile[] = [initialTile, initialTile, initialTile]
   const initialState: IBoardContextState = {
-    board: { tiles: [initialRow, initialRow, initialRow] },
-    isGameOver: false,
+    board: createNewBoard(),
     hasWon: false,
+    isGameOver: false,
   }
 
   const [state, dispatch] = useReducer(BoardReducer, initialState)
@@ -122,11 +137,21 @@ export function BoardProvider({ children }: Readonly<IBoardProviderProps>) {
 }
 // #endregion
 
-// #region Reducer definition
+// #region Reducer definitions
 function BoardReducer(
   state: IBoardContextState,
   action: IBoardContextAction,
 ): IBoardContextState {
+  if (action.type === 'restart') {
+    return {
+      board: createNewBoard(),
+      hasWon: false,
+      isGameOver: false,
+    }
+  }
+
+  if (state.isGameOver) return state
+
   switch (action.type) {
     case 'move': {
       resetCombinedStates(state.board)
