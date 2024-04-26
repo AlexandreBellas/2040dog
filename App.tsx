@@ -1,20 +1,17 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { config } from '@gluestack-ui/config' // Optional if you want to use default theme
+import { Box, GluestackUIProvider, Text } from '@gluestack-ui/themed'
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+    <GluestackUIProvider config={config}>
+      <Box
+        width="100%"
+        justifyContent="center"
+        alignItems="center"
+        backgroundColor="black"
+      >
+        <Text color="white">Open up App.js to start working on your app!!</Text>
+      </Box>
+    </GluestackUIProvider>
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
