@@ -1,17 +1,12 @@
-import { config } from '@gluestack-ui/config' // Optional if you want to use default theme
-import { Box, GluestackUIProvider, Text } from '@gluestack-ui/themed'
+import { config } from '@gluestack-ui/config'
+import { GluestackUIProvider } from '@gluestack-ui/themed'
+import WebLayout from '@layouts/WebLayout'
+import { Platform } from 'react-native'
 
 export default function App() {
   return (
     <GluestackUIProvider config={config}>
-      <Box
-        width="100%"
-        justifyContent="center"
-        alignItems="center"
-        backgroundColor="black"
-      >
-        <Text color="white">Open up App.js to start working on your app!!</Text>
-      </Box>
+      {Platform.OS === 'web' && <WebLayout />}
     </GluestackUIProvider>
   )
 }

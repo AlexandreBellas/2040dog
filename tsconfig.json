@@ -4,7 +4,10 @@
     "strict": true,
     "paths": {
       "@helpers/*": ["./src/utils/helpers/*"],
-      "@interfaces/*": ["./src/interfaces/*"]
+      "@interfaces/*": ["./src/interfaces/*"],
+      "@contexts/*": ["./src/contexts/*"],
+      "@views/*": ["./src/views/*"],
+      "@layouts/*": ["./src/layouts/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"]
