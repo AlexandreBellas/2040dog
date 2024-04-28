@@ -2,7 +2,7 @@ import { useBoard, useBoardDispatch } from '@contexts/BoardContext'
 import { Box, HStack, Text, VStack } from '@gluestack-ui/themed'
 import { IDirection } from '@interfaces/direction'
 import { useEffect } from 'react'
-import { Platform } from 'react-native'
+import { Alert, Platform } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 
 import Tile from './Tile'
@@ -73,10 +73,18 @@ export default function Board() {
     if (!isGameOver) return
 
     setTimeout(() => {
-      if (hasWon) alert('eba')
-      else alert('afs')
+      if (hasWon) alert('Congratulations! ❤️ You deserve 2040 lickisses 🐶')
+      else
+        Alert.prompt('You lost 🥺', 'Try again?', [
+          {
+            text: 'Yessss!',
+            onPress: () => {
+              boardDispatch({ type: 'restart' })
+            },
+          },
+        ])
     }, 100)
-  }, [isGameOver, hasWon])
+  }, [boardDispatch, isGameOver, hasWon])
 
   // #endregion
 
