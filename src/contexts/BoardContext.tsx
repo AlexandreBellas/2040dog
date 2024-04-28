@@ -1,6 +1,7 @@
 import { IBoard } from '@interfaces/board'
 import { IDirection } from '@interfaces/direction'
 import { IPosition } from '@interfaces/position'
+import { ITile } from '@interfaces/tile'
 import React, { createContext, useContext, useReducer } from 'react'
 
 // #region Context types
@@ -34,14 +35,17 @@ const boardLength = 4
 
 // #region Functions
 function createNewBoard() {
-  // const tiles: ITile[][] = []
-  // for (let i = 0; i < boardLength; i++) {
-  //   tiles.push([])
-  //   for (let j = 0; j < boardLength; j++) {
-  //     tiles[i].push({ value: null, isCombined: false })
-  //   }
-  // }
-  // return { tiles } as IBoard
+  const tiles: ITile[][] = []
+  for (let i = 0; i < boardLength; i++) {
+    tiles.push([])
+    for (let j = 0; j < boardLength; j++) {
+      tiles[i].push({ value: null, isCombined: false })
+    }
+  }
+  return { tiles } as IBoard
+}
+
+function createTestBoard() {
   return {
     tiles: [
       [
