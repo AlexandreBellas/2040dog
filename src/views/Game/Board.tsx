@@ -1,24 +1,48 @@
 import { useBoard, useBoardDispatch } from '@contexts/BoardContext'
-import { Box, HStack, VStack } from '@gluestack-ui/themed'
+import { Box, HStack, Text, VStack } from '@gluestack-ui/themed'
 import { IDirection } from '@interfaces/direction'
 import { useEffect } from 'react'
+import { Platform } from 'react-native'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 
 import Tile from './Tile'
 
 export default function Board() {
-  // #region Constant values
-  const space = 'md'
-  // #endregion
-
   // #region Contexts
   const { board, isGameOver, hasWon, numOfMoves } = useBoard()
   const boardDispatch = useBoardDispatch()
+  // #endregion
+
+  // #region Constant values
+  const space = 'md'
+  const pan = Gesture.Pan()
+    .activeOffsetX([-100, 100])
+    .activeOffsetY([-100, 100])
+    .onEnd((e) => {
+      if (Math.abs(e.velocityX) > Math.abs(e.velocityY)) {
+        if (e.velocityX > 0) {
+          boardDispatch({ type: 'move', direction: 'right' })
+        } else {
+          boardDispatch({ type: 'move', direction: 'left' })
+        }
+
+        return
+      }
+
+      if (e.velocityY > 0) {
+        boardDispatch({ type: 'move', direction: 'down' })
+      } else {
+        boardDispatch({ type: 'move', direction: 'up' })
+      }
+    })
   // #endregion
 
   // #region Effects
 
   // Keyboard listener
   useEffect(() => {
+    if (Platform.OS !== 'web') return
+
     function keyDownHandler(e: KeyboardEvent) {
       const keyMap: Record<string, IDirection> = {
         ArrowUp: 'up',
@@ -57,25 +81,32 @@ export default function Board() {
   // #endregion
 
   return (
-    <Box>
-      <VStack
-        borderRadius={`$${space}`}
-        borderColor="#bbada0"
-        borderWidth="$8"
-        space={space}
-        backgroundColor="#bbada0"
-      >
-        {board.tiles.map((row, rowIdx) => (
-          <HStack key={`tiles-row-${row.toString()}-${rowIdx}`} space={space}>
-            {row.map((tile, columnIdx) => (
-              <Tile
-                key={`tiles-column-${rowIdx}-${columnIdx}`}
-                value={tile.value}
-              />
-            ))}
-          </HStack>
-        ))}
-      </VStack>
-    </Box>
+    <GestureDetector gesture={pan}>
+      <Box alignItems="center" width="100%">
+        <Text fontFamily="$heading" fontSize="$6xl">
+          2040🐶
+        </Text>
+        <Text>(yet no dogs)</Text>
+        <VStack
+          borderRadius={`$${space}`}
+          borderColor="#bbada0"
+          borderWidth="$8"
+          space={space}
+          backgroundColor="#bbada0"
+          marginTop="$2"
+        >
+          {board.tiles.map((row, rowIdx) => (
+            <HStack key={`tiles-row-${row.toString()}-${rowIdx}`} space={space}>
+              {row.map((tile, columnIdx) => (
+                <Tile
+                  key={`tiles-column-${rowIdx}-${columnIdx}`}
+                  value={tile.value}
+                />
+              ))}
+            </HStack>
+          ))}
+        </VStack>
+      </Box>
+    </GestureDetector>
   )
 }

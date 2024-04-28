@@ -15,14 +15,14 @@ export default function Tile(props: Readonly<ITileProps>) {
     <Box
       borderRadius="$md"
       backgroundColor={bg}
-      minHeight="$24"
-      minWidth="$24"
+      minHeight="$20"
+      minWidth="$20"
       maxHeight="$80"
       maxWidth="$80"
       alignItems="center"
       justifyContent="center"
     >
-      <Text color={text} fontSize="$4xl" fontWeight="$bold">
+      <Text color={text} fontSize="$3xl" fontWeight="$bold">
         {value}
       </Text>
     </Box>

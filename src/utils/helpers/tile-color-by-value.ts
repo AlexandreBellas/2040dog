@@ -19,35 +19,35 @@ const valueColorMap: Record<number, ITileColors> = {
     text: '$white',
   },
   16: {
-    bg: '$cyan400',
+    bg: '$orange200',
     text: '$black',
   },
   32: {
-    bg: '$cyan400',
+    bg: '$red400',
     text: '$black',
   },
   64: {
-    bg: '$cyan400',
-    text: '$black',
+    bg: '#635e53',
+    text: '$white',
   },
   128: {
-    bg: '$cyan400',
-    text: '$black',
+    bg: '#523f15',
+    text: '$white',
   },
   256: {
-    bg: '$cyan400',
+    bg: '$green400',
     text: '$black',
   },
   512: {
-    bg: '$cyan400',
+    bg: '$cyan200',
     text: '$black',
   },
   1024: {
-    bg: '$cyan400',
+    bg: '$indigo300',
     text: '$black',
   },
   2048: {
-    bg: '$cyan400',
+    bg: '$yellow300',
     text: '$black',
   },
 }
