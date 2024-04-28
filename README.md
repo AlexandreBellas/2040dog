@@ -9,7 +9,7 @@ Inspired by the ideas of [Lia Kim Rodrigues](https://github.com/liakimr).
 ## To-do
 
 - [x] Translate the previous Python version to Javascript
-- [ ] Implement up/down/left/right movement dynamics
-- [ ] Implement pieces combination when they have the same value
-- [ ] Implement end-game conditions
+- [x] Implement up/down/left/right movement dynamics
+- [x] Implement pieces combination when they have the same value
+- [x] Implement end-game conditions
 - [ ] Add layout and styling structure
