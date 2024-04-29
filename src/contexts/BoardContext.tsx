@@ -314,7 +314,7 @@ export function useBoardHelpers() {
 // #region Provider definitions
 export function BoardProvider({ children }: Readonly<IBoardProviderProps>) {
   const initialState: IBoardContextState = {
-    board: createNewBoard(),
+    board: createTestBoard(),
     hasWon: false,
     isGameOver: false,
     numOfMoves: 0,

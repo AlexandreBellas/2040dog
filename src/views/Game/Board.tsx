@@ -16,8 +16,8 @@ export default function Board() {
   // #region Constant values
   const space = 'md'
   const pan = Gesture.Pan()
-    .activeOffsetX([-100, 100])
-    .activeOffsetY([-100, 100])
+    .activeOffsetX([-400, 400])
+    .activeOffsetY([-400, 400])
     .onEnd((e) => {
       if (Math.abs(e.velocityX) > Math.abs(e.velocityY)) {
         if (e.velocityX > 0) {
@@ -73,16 +73,39 @@ export default function Board() {
     if (!isGameOver) return
 
     setTimeout(() => {
-      if (hasWon) alert('Congratulations! ❤️ You deserve 2040 lickisses 🐶')
-      else
-        Alert.prompt('You lost 🥺', 'Try again?', [
+      if (hasWon) {
+        if (Platform.OS === 'web') {
+          alert('Congratulations! ❤️ You deserve 2040 lickisses 🐶')
+          return
+        }
+
+        Alert.alert('Congratulations! ❤️', 'You deserve 2040 lickisses 🐶', [
           {
-            text: 'Yessss!',
+            text: 'Yay!',
+          },
+          {
+            text: 'Replay',
             onPress: () => {
               boardDispatch({ type: 'restart' })
             },
           },
         ])
+        return
+      }
+
+      if (Platform.OS === 'web' && confirm('You lost 🥺. Try again?')) {
+        boardDispatch({ type: 'restart' })
+        return
+      }
+
+      Alert.alert('You lost 🥺', 'Try again?', [
+        {
+          text: 'Yessss!',
+          onPress: () => {
+            boardDispatch({ type: 'restart' })
+          },
+        },
+      ])
     }, 100)
   }, [boardDispatch, isGameOver, hasWon])
 
