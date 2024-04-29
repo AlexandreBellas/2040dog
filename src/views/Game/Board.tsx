@@ -16,8 +16,8 @@ export default function Board() {
   // #region Constant values
   const space = 'md'
   const pan = Gesture.Pan()
-    .activeOffsetX([-400, 400])
-    .activeOffsetY([-400, 400])
+    .activeOffsetX([-200, 200])
+    .activeOffsetY([-200, 200])
     .onEnd((e) => {
       if (Math.abs(e.velocityX) > Math.abs(e.velocityY)) {
         if (e.velocityX > 0) {
