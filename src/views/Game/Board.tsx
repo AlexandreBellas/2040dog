@@ -4,6 +4,7 @@ import { IDirection } from '@interfaces/direction'
 import { useEffect } from 'react'
 import { Alert, Platform } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import { useSharedValue } from 'react-native-reanimated'
 
 import Tile from './Tile'
 
@@ -15,12 +16,20 @@ export default function Board() {
 
   // #region Constant values
   const space = 'md'
+  const startXSlide = useSharedValue<number | null>(null)
+  const startYSlide = useSharedValue<number | null>(null)
   const pan = Gesture.Pan()
-    .activeOffsetX([-200, 200])
-    .activeOffsetY([-200, 200])
+    .activeOffsetX([-100, 100])
+    .activeOffsetY([-100, 100])
+    .onStart((e) => {
+      startXSlide.value = e.x
+      startYSlide.value = e.y
+    })
     .onEnd((e) => {
-      if (Math.abs(e.velocityX) > Math.abs(e.velocityY)) {
-        if (e.velocityX > 0) {
+      const dx = e.x - (startXSlide.value ?? 0)
+      const dy = e.y - (startYSlide.value ?? 0)
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 0) {
           boardDispatch({ type: 'move', direction: 'right' })
         } else {
           boardDispatch({ type: 'move', direction: 'left' })
@@ -29,11 +38,15 @@ export default function Board() {
         return
       }
 
-      if (e.velocityY > 0) {
+      if (dy > 0) {
         boardDispatch({ type: 'move', direction: 'down' })
       } else {
         boardDispatch({ type: 'move', direction: 'up' })
       }
+    })
+    .onFinalize(() => {
+      startXSlide.value = null
+      startYSlide.value = null
     })
   // #endregion
 
