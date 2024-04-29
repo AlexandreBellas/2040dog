@@ -12,4 +12,5 @@ Inspired by the ideas of [Lia Kim Rodrigues](https://github.com/liakimr).
 - [x] Implement up/down/left/right movement dynamics
 - [x] Implement pieces combination when they have the same value
 - [x] Implement end-game conditions
-- [ ] Add layout and styling structure
+- [x] Add layout and styling structure
+- [ ] Add dogs
