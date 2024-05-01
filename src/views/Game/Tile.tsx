@@ -30,7 +30,7 @@ export default function Tile(props: Readonly<ITileProps>) {
           w="$full"
           h="$full"
           position="absolute"
-          opacity="$20"
+          opacity="$10"
           source={imageUri}
         />
       )}

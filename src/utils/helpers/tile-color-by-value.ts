@@ -15,6 +15,7 @@ const styleMap: Record<number, ITileStyle> = {
   4: {
     bgColor: '$coolGray400',
     textColor: '$black',
+    imageUri: require('@assets/dogs/4.png'),
   },
   8: {
     bgColor: '$coolGray600',
