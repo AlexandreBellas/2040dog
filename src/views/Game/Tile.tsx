@@ -135,16 +135,12 @@ const Tile = (props: Readonly<ITileProps>) => {
     <Box backgroundColor={bgColorNull} borderRadius="$md">
       <AnimatedBox
         key={`${i}-${j}`}
-        backgroundColor={
-          isNew && isNewAnimationState === 0 ? bgColorNull : bgColor
-        }
+        backgroundColor={bgColor}
         borderRadius="$md"
         alignItems="center"
         justifyContent="center"
       >
-        {image && !(isNew && isNewAnimationState === 0) && (
-          <TileImage source={image.source} alt={image.alt} />
-        )}
+        {image && <TileImage source={image.source} alt={image.alt} />}
         <Text color={textColor} fontSize="$3xl" fontWeight="$bold">
           {value}
         </Text>
