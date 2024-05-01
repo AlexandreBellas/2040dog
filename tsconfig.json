@@ -7,7 +7,8 @@
       "@interfaces/*": ["./src/interfaces/*"],
       "@contexts/*": ["./src/contexts/*"],
       "@views/*": ["./src/views/*"],
-      "@layouts/*": ["./src/layouts/*"]
+      "@layouts/*": ["./src/layouts/*"],
+      "@assets/*": ["./assets/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"]

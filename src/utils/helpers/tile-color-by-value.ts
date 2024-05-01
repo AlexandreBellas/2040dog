@@ -1,63 +1,65 @@
 import { IColor } from '@interfaces/colors'
 
-interface ITileColors {
-  bg: IColor
-  text: IColor
+interface ITileStyle {
+  bgColor: IColor
+  textColor: IColor
+  imageUri?: string
 }
 
-const valueColorMap: Record<number, ITileColors> = {
+const styleMap: Record<number, ITileStyle> = {
   2: {
-    bg: '$coolGray200',
-    text: '$black',
+    bgColor: '$coolGray200',
+    textColor: '$black',
+    imageUri: require('@assets/dogs/2.png'),
   },
   4: {
-    bg: '$coolGray400',
-    text: '$black',
+    bgColor: '$coolGray400',
+    textColor: '$black',
   },
   8: {
-    bg: '$coolGray600',
-    text: '$white',
+    bgColor: '$coolGray600',
+    textColor: '$white',
   },
   16: {
-    bg: '$orange200',
-    text: '$black',
+    bgColor: '$orange200',
+    textColor: '$black',
   },
   32: {
-    bg: '$red400',
-    text: '$black',
+    bgColor: '$red400',
+    textColor: '$black',
   },
   64: {
-    bg: '#635e53',
-    text: '$white',
+    bgColor: '#635e53',
+    textColor: '$white',
   },
   128: {
-    bg: '#523f15',
-    text: '$white',
+    bgColor: '#523f15',
+    textColor: '$white',
   },
   256: {
-    bg: '$green400',
-    text: '$black',
+    bgColor: '$green400',
+    textColor: '$black',
   },
   512: {
-    bg: '$cyan200',
-    text: '$black',
+    bgColor: '$cyan200',
+    textColor: '$black',
   },
   1024: {
-    bg: '$indigo300',
-    text: '$black',
+    bgColor: '$indigo300',
+    textColor: '$black',
   },
   2048: {
-    bg: '$yellow300',
-    text: '$black',
+    bgColor: '$yellow300',
+    textColor: '$black',
   },
 }
 
-export default function tileColorByValue(value?: number | null): ITileColors {
+export default function tileColorByValue(value?: number | null): ITileStyle {
   if (typeof value !== 'number') {
-    return { bg: '$trueGray300', text: '$trueGray300' }
+    return { bgColor: '$trueGray300', textColor: '$trueGray300' }
   }
 
-  const color = valueColorMap[value]
+  const color = styleMap[value]
   if (!color) throw new Error(`Invalid value: "${value}".`)
 
   return color

@@ -1,4 +1,4 @@
-import { Box, Text } from '@gluestack-ui/themed'
+import { Box, Image, Text } from '@gluestack-ui/themed'
 import tileColorByValue from '@helpers/tile-color-by-value'
 import { useMemo } from 'react'
 
@@ -9,12 +9,15 @@ interface ITileProps {
 export default function Tile(props: Readonly<ITileProps>) {
   const { value } = props
 
-  const { bg, text } = useMemo(() => tileColorByValue(value), [value])
+  const { bgColor, textColor, imageUri } = useMemo(
+    () => tileColorByValue(value),
+    [value],
+  )
 
   return (
     <Box
       borderRadius="$md"
-      backgroundColor={bg}
+      backgroundColor={bgColor}
       minHeight="$20"
       minWidth="$20"
       maxHeight="$80"
@@ -22,7 +25,16 @@ export default function Tile(props: Readonly<ITileProps>) {
       alignItems="center"
       justifyContent="center"
     >
-      <Text color={text} fontSize="$3xl" fontWeight="$bold">
+      {imageUri && (
+        <Image
+          w="$full"
+          h="$full"
+          position="absolute"
+          opacity="$20"
+          source={imageUri}
+        />
+      )}
+      <Text color={textColor} fontSize="$3xl" fontWeight="$bold">
         {value}
       </Text>
     </Box>

@@ -133,7 +133,7 @@ export default function Board() {
         <Text fontFamily="$heading" fontSize="$6xl">
           2040🐶
         </Text>
-        <Text>(yet no dogs)</Text>
+        <Text>(only some dogs)</Text>
         <VStack
           borderRadius={`$${space}`}
           borderColor="#bbada0"
