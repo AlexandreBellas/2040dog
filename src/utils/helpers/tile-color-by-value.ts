@@ -29,14 +29,26 @@ const styleMap: Record<number, ITileStyle> = {
   8: {
     bgColor: '$coolGray600',
     textColor: '$white',
+    image: {
+      source: require('@assets/dogs/8.png'),
+      alt: 'Beagle',
+    },
   },
   16: {
     bgColor: '$orange200',
     textColor: '$black',
+    image: {
+      source: require('@assets/dogs/16.png'),
+      alt: 'Daschund',
+    },
   },
   32: {
-    bgColor: '$red400',
+    bgColor: '$red200',
     textColor: '$black',
+    image: {
+      source: require('@assets/dogs/32.png'),
+      alt: 'Corgi',
+    },
   },
   64: {
     bgColor: '#635e53',
