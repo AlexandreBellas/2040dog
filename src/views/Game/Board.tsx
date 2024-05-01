@@ -28,6 +28,9 @@ export default function Board() {
     .onEnd((e) => {
       const dx = e.x - (startXSlide.value ?? 0)
       const dy = e.y - (startYSlide.value ?? 0)
+
+      if (dx === 0 && dy === 0) return
+
       if (Math.abs(dx) > Math.abs(dy)) {
         if (dx > 0) {
           boardDispatch({ type: 'move', direction: 'right' })
