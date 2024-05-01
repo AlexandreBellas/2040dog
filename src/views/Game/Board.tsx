@@ -10,8 +10,7 @@ import Tile from './Tile'
 
 const Board = () => {
   // #region Contexts
-  const { board, boardPreviousState, isGameOver, hasWon, numOfMoves } =
-    useBoard()
+  const { board, isGameOver, hasWon, numOfMoves } = useBoard()
   const boardDispatch = useBoardDispatch()
   // #endregion
 
@@ -20,14 +19,12 @@ const Board = () => {
   // #endregion
 
   // #region Animation
-  // #region Shared values
   const startXSlide = useSharedValue<number | null>(null)
   const startYSlide = useSharedValue<number | null>(null)
-  // #endregion
-  // #region Gestures
+
   const pan = Gesture.Pan()
-    .activeOffsetX([-100, 100])
-    .activeOffsetY([-100, 100])
+    .activeOffsetX([-80, 80])
+    .activeOffsetY([-80, 80])
     .onStart((e) => {
       startXSlide.value = e.x
       startYSlide.value = e.y
@@ -57,7 +54,6 @@ const Board = () => {
       startXSlide.value = null
       startYSlide.value = null
     })
-  // #endregion
   // #endregion
 
   // #region Effects
@@ -136,7 +132,7 @@ const Board = () => {
 
   return (
     <GestureDetector gesture={pan}>
-      <Box alignItems="center" width="100%">
+      <Box alignItems="center" width="$full">
         <Text fontFamily="$heading" fontSize="$6xl">
           2040🐶
         </Text>
