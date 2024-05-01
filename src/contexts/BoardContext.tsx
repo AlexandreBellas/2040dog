@@ -1,5 +1,6 @@
 import { IBoard } from '@interfaces/board'
 import { IDirection } from '@interfaces/direction'
+import { IMove } from '@interfaces/move'
 import { IPosition } from '@interfaces/position'
 import { ITile } from '@interfaces/tile'
 import React, { createContext, useContext, useReducer } from 'react'
@@ -11,6 +12,8 @@ interface IBoardProviderProps {
 
 interface IBoardContextState {
   board: IBoard
+  boardPreviousState: IBoard
+  tilesLastMoves: IMove[]
   isGameOver: boolean
   hasWon: boolean
   numOfMoves: number
@@ -74,6 +77,12 @@ function createTestBoard() {
       ],
     ],
   } as IBoard
+}
+
+function deepCopyBoard(board: IBoard): IBoard {
+  return {
+    tiles: [...board.tiles.map((row) => [...row.map((tile) => ({ ...tile }))])],
+  }
 }
 
 function listEmptySpots(board: IBoard) {
@@ -145,147 +154,156 @@ function resetCombinedStates(board: IBoard) {
   return board
 }
 
-function move(board: IBoard, direction: IDirection) {
+function move(board: IBoard, direction: IDirection): IMove[] {
+  const moves: IMove[] = []
+
   switch (direction) {
     case 'up': {
-      return board.tiles
-        .map((row, i, tiles) =>
-          row.map((tile, j) => {
-            if (i === 0 || tile.value === null) return false
+      board.tiles.forEach((row, i, tiles) =>
+        row.forEach((tile, j) => {
+          if (i === 0 || tile.value === null) return
 
-            let nextI = i
-            while (nextI > 0 && tiles[nextI - 1][j].value === null) {
-              nextI--
-            }
+          let nextI = i
+          while (nextI > 0 && tiles[nextI - 1][j].value === null) {
+            nextI--
+          }
 
-            if (
-              nextI > 0 &&
-              tiles[nextI - 1][j].value === tile.value &&
-              !tiles[nextI - 1][j].isCombined
-            ) {
-              tiles[nextI - 1][j] = { value: tile.value * 2, isCombined: true }
-            } else {
-              if (nextI === i) return false
-              tiles[nextI][j] = { ...tile }
-            }
+          if (
+            nextI > 0 &&
+            tiles[nextI - 1][j].value === tile.value &&
+            !tiles[nextI - 1][j].isCombined
+          ) {
+            tiles[nextI - 1][j] = { value: tile.value * 2, isCombined: true }
+          } else {
+            if (nextI === i) return
+            tiles[nextI][j] = { ...tile }
+          }
 
-            tiles[i][j] = { value: null, isCombined: false }
+          tiles[i][j] = { value: null, isCombined: false }
 
-            return true
-          }),
-        )
-        .flat()
-        .some((item) => item === true)
+          moves.push({
+            previous: { i, j },
+            after: { i: nextI, j },
+          })
+        }),
+      )
+
+      break
     }
     case 'down': {
       const reversedIndexes = Array.from(
         Array(board.tiles.length).keys(),
       ).reverse()
 
-      return reversedIndexes
-        .map((i) => {
-          const tiles = board.tiles
-          const row = board.tiles[i]
+      reversedIndexes.forEach((i) => {
+        const tiles = board.tiles
+        const row = board.tiles[i]
 
-          return row.map((tile, j) => {
-            if (i === boardLength - 1 || tile.value === null) return false
+        return row.forEach((tile, j) => {
+          if (i === boardLength - 1 || tile.value === null) return
 
-            let nextI = i
-            while (
-              nextI < boardLength - 1 &&
-              tiles[nextI + 1][j].value === null
-            ) {
-              nextI++
-            }
+          let nextI = i
+          while (
+            nextI < boardLength - 1 &&
+            tiles[nextI + 1][j].value === null
+          ) {
+            nextI++
+          }
 
-            if (
-              nextI < boardLength - 1 &&
-              tiles[nextI + 1][j].value === tile.value &&
-              !tiles[nextI + 1][j].isCombined
-            ) {
-              tiles[nextI + 1][j] = { value: tile.value * 2, isCombined: true }
-            } else {
-              if (nextI === i) return false
-              tiles[nextI][j] = { ...tile }
-            }
+          if (
+            nextI < boardLength - 1 &&
+            tiles[nextI + 1][j].value === tile.value &&
+            !tiles[nextI + 1][j].isCombined
+          ) {
+            tiles[nextI + 1][j] = { value: tile.value * 2, isCombined: true }
+          } else {
+            if (nextI === i) return
+            tiles[nextI][j] = { ...tile }
+          }
 
-            tiles[i][j] = { value: null, isCombined: false }
+          tiles[i][j] = { value: null, isCombined: false }
 
-            return true
+          moves.push({
+            previous: { i, j },
+            after: { i: nextI, j },
           })
         })
-        .flat()
-        .some((item) => item === true)
+      })
+
+      break
     }
     case 'left': {
-      return board.tiles
-        .map((row, i, tiles) =>
-          row.map((tile, j) => {
-            if (j === 0 || tile.value === null) return false
+      board.tiles.forEach((row, i, tiles) =>
+        row.forEach((tile, j) => {
+          if (j === 0 || tile.value === null) return
 
-            let nextJ = j
-            while (nextJ > 0 && tiles[i][nextJ - 1].value === null) {
-              nextJ--
-            }
+          let nextJ = j
+          while (nextJ > 0 && tiles[i][nextJ - 1].value === null) {
+            nextJ--
+          }
 
-            if (
-              nextJ > 0 &&
-              tiles[i][nextJ - 1].value === tile.value &&
-              !tiles[i][nextJ - 1].isCombined
-            ) {
-              tiles[i][nextJ - 1] = { value: tile.value * 2, isCombined: true }
-            } else {
-              if (nextJ === j) return false
-              tiles[i][nextJ] = { ...tile }
-            }
+          if (
+            nextJ > 0 &&
+            tiles[i][nextJ - 1].value === tile.value &&
+            !tiles[i][nextJ - 1].isCombined
+          ) {
+            tiles[i][nextJ - 1] = { value: tile.value * 2, isCombined: true }
+          } else {
+            if (nextJ === j) return
+            tiles[i][nextJ] = { ...tile }
+          }
 
-            tiles[i][j] = { value: null, isCombined: false }
+          tiles[i][j] = { value: null, isCombined: false }
 
-            return true
-          }),
-        )
-        .flat()
-        .some((item) => item === true)
+          moves.push({
+            previous: { i, j },
+            after: { i, j: nextJ },
+          })
+        }),
+      )
+
+      break
     }
     case 'right': {
-      return board.tiles
-        .map((row, i, tiles) => {
-          const reversedIndexes = Array.from(
-            Array(board.tiles.length).keys(),
-          ).reverse()
+      board.tiles.forEach((row, i, tiles) => {
+        const reversedIndexes = Array.from(
+          Array(board.tiles.length).keys(),
+        ).reverse()
 
-          return reversedIndexes.map((j) => {
-            const tile = tiles[i][j]
-            if (j === boardLength - 1 || tile.value === null) return false
+        return reversedIndexes.forEach((j) => {
+          const tile = tiles[i][j]
+          if (j === boardLength - 1 || tile.value === null) return
 
-            let nextJ = j
-            while (
-              nextJ < boardLength - 1 &&
-              tiles[i][nextJ + 1].value == null
-            ) {
-              nextJ++
-            }
+          let nextJ = j
+          while (nextJ < boardLength - 1 && tiles[i][nextJ + 1].value == null) {
+            nextJ++
+          }
 
-            if (
-              nextJ < boardLength - 1 &&
-              tiles[i][nextJ + 1].value === tile.value &&
-              !tiles[i][nextJ + 1].isCombined
-            ) {
-              tiles[i][nextJ + 1] = { value: tile.value * 2, isCombined: true }
-            } else {
-              if (nextJ === j) return false
-              tiles[i][nextJ] = { ...tile }
-            }
+          if (
+            nextJ < boardLength - 1 &&
+            tiles[i][nextJ + 1].value === tile.value &&
+            !tiles[i][nextJ + 1].isCombined
+          ) {
+            tiles[i][nextJ + 1] = { value: tile.value * 2, isCombined: true }
+          } else {
+            if (nextJ === j) return
+            tiles[i][nextJ] = { ...tile }
+          }
 
-            tiles[i][j] = { value: null, isCombined: false }
+          tiles[i][j] = { value: null, isCombined: false }
 
-            return true
+          moves.push({
+            previous: { i, j },
+            after: { i, j: nextJ },
           })
         })
-        .flat()
-        .some((item) => item === true)
+      })
+
+      break
     }
   }
+
+  return moves
 }
 
 // #endregion
@@ -313,8 +331,11 @@ export function useBoardHelpers() {
 
 // #region Provider definitions
 export function BoardProvider({ children }: Readonly<IBoardProviderProps>) {
+  const board = createNewBoard()
   const initialState: IBoardContextState = {
-    board: createNewBoard(),
+    board,
+    boardPreviousState: board,
+    tilesLastMoves: [],
     hasWon: false,
     isGameOver: false,
     numOfMoves: 0,
@@ -337,9 +358,14 @@ function BoardReducer(
   state: IBoardContextState,
   action: IBoardContextAction,
 ): IBoardContextState {
+  resetCombinedStates(state.board)
+
   if (action.type === 'restart') {
+    const board = createNewBoard()
     return {
-      board: createNewBoard(),
+      board,
+      boardPreviousState: board,
+      tilesLastMoves: [],
       hasWon: false,
       isGameOver: false,
       numOfMoves: 0,
@@ -348,18 +374,20 @@ function BoardReducer(
 
   if (state.isGameOver) return state
 
+  const boardPreviousState = deepCopyBoard(state.board)
   switch (action.type) {
     case 'move': {
-      const hasMoved = move(state.board, action.direction)
-      resetCombinedStates(state.board)
+      const moves = move(state.board, action.direction)
       const hasWon = doesBoardHave2048(state.board)
       const isGameOver = hasWon || !isPossibleToMove(state.board)
 
       return {
         ...state,
+        boardPreviousState,
+        tilesLastMoves: moves,
         hasWon,
         isGameOver,
-        numOfMoves: state.numOfMoves + (hasMoved ? 1 : 0),
+        numOfMoves: state.numOfMoves + (moves.length > 0 ? 1 : 0),
       }
     }
     case 'insert': {
@@ -368,6 +396,7 @@ function BoardReducer(
       insertRandomTile(state.board)
       return {
         ...state,
+        boardPreviousState,
         isGameOver: !isPossibleToMove(state.board),
       }
     }

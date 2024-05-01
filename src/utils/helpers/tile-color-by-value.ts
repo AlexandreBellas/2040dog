@@ -3,19 +3,28 @@ import { IColor } from '@interfaces/colors'
 interface ITileStyle {
   bgColor: IColor
   textColor: IColor
-  imageUri?: string
+  image?: {
+    source: string
+    alt: string
+  }
 }
 
 const styleMap: Record<number, ITileStyle> = {
   2: {
     bgColor: '$coolGray200',
     textColor: '$black',
-    imageUri: require('@assets/dogs/2.png'),
+    image: {
+      source: require('@assets/dogs/2.png'),
+      alt: 'Yorkshire',
+    },
   },
   4: {
     bgColor: '$coolGray400',
     textColor: '$black',
-    imageUri: require('@assets/dogs/4.png'),
+    image: {
+      source: require('@assets/dogs/4.png'),
+      alt: 'Brazilian terrier',
+    },
   },
   8: {
     bgColor: '$coolGray600',

@@ -16,8 +16,14 @@ export default function Board() {
 
   // #region Constant values
   const space = 'md'
+  // #endregion
+
+  // #region Animation
+  // #region Shared values
   const startXSlide = useSharedValue<number | null>(null)
   const startYSlide = useSharedValue<number | null>(null)
+  // #endregion
+  // #region Gestures
   const pan = Gesture.Pan()
     .activeOffsetX([-100, 100])
     .activeOffsetY([-100, 100])
@@ -28,29 +34,29 @@ export default function Board() {
     .onEnd((e) => {
       const dx = e.x - (startXSlide.value ?? 0)
       const dy = e.y - (startYSlide.value ?? 0)
-
       if (dx === 0 && dy === 0) return
 
+      let boardAction: { type: 'move'; direction: IDirection }
+
       if (Math.abs(dx) > Math.abs(dy)) {
-        if (dx > 0) {
-          boardDispatch({ type: 'move', direction: 'right' })
-        } else {
-          boardDispatch({ type: 'move', direction: 'left' })
-        }
-
-        return
-      }
-
-      if (dy > 0) {
-        boardDispatch({ type: 'move', direction: 'down' })
+        boardAction =
+          dx > 0
+            ? { type: 'move', direction: 'right' }
+            : { type: 'move', direction: 'left' }
       } else {
-        boardDispatch({ type: 'move', direction: 'up' })
+        boardAction =
+          dy > 0
+            ? { type: 'move', direction: 'down' }
+            : { type: 'move', direction: 'up' }
       }
+
+      boardDispatch(boardAction)
     })
     .onFinalize(() => {
       startXSlide.value = null
       startYSlide.value = null
     })
+  // #endregion
   // #endregion
 
   // #region Effects
@@ -147,7 +153,10 @@ export default function Board() {
               {row.map((tile, columnIdx) => (
                 <Tile
                   key={`tiles-column-${rowIdx}-${columnIdx}`}
+                  i={rowIdx}
+                  j={columnIdx}
                   value={tile.value}
+                  hasBeenCombined={tile.isCombined}
                 />
               ))}
             </HStack>
