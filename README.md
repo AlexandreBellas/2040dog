@@ -13,4 +13,5 @@ Inspired by the ideas of [Lia Kim Rodrigues](https://github.com/liakimr).
 - [x] Implement pieces combination when they have the same value
 - [x] Implement end-game conditions
 - [x] Add layout and styling structure
+- [ ] Add fluid in-game play
 - [ ] Add dogs
