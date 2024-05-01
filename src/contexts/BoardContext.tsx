@@ -42,7 +42,7 @@ function createNewBoard() {
   for (let i = 0; i < boardLength; i++) {
     tiles.push([])
     for (let j = 0; j < boardLength; j++) {
-      tiles[i].push({ value: null, isCombined: false })
+      tiles[i].push({ value: null, isCombined: false, isNew: false })
     }
   }
   return { tiles } as IBoard
@@ -112,6 +112,7 @@ function insertRandomTile(board: IBoard) {
   const randomSpot = emptySpots[randomSpotIndex]
 
   board.tiles[randomSpot.i][randomSpot.j].value = newRandomTileValue()
+  board.tiles[randomSpot.i][randomSpot.j].isNew = true
 
   return board
 }
@@ -144,10 +145,11 @@ function doesBoardHave2048(board: IBoard) {
   return board.tiles.some((row) => row.some((tile) => tile.value === 2048))
 }
 
-function resetCombinedStates(board: IBoard) {
+function resetCombinedAndNewStates(board: IBoard) {
   board.tiles.forEach((row) => {
     row.forEach((_, idx, arr) => {
       arr[idx].isCombined = false
+      arr[idx].isNew = false
     })
   })
 
@@ -173,13 +175,17 @@ function move(board: IBoard, direction: IDirection): IMove[] {
             tiles[nextI - 1][j].value === tile.value &&
             !tiles[nextI - 1][j].isCombined
           ) {
-            tiles[nextI - 1][j] = { value: tile.value * 2, isCombined: true }
+            tiles[nextI - 1][j] = {
+              value: tile.value * 2,
+              isCombined: true,
+              isNew: false,
+            }
           } else {
             if (nextI === i) return
             tiles[nextI][j] = { ...tile }
           }
 
-          tiles[i][j] = { value: null, isCombined: false }
+          tiles[i][j] = { value: null, isCombined: false, isNew: false }
 
           moves.push({
             previous: { i, j },
@@ -215,13 +221,17 @@ function move(board: IBoard, direction: IDirection): IMove[] {
             tiles[nextI + 1][j].value === tile.value &&
             !tiles[nextI + 1][j].isCombined
           ) {
-            tiles[nextI + 1][j] = { value: tile.value * 2, isCombined: true }
+            tiles[nextI + 1][j] = {
+              value: tile.value * 2,
+              isCombined: true,
+              isNew: false,
+            }
           } else {
             if (nextI === i) return
             tiles[nextI][j] = { ...tile }
           }
 
-          tiles[i][j] = { value: null, isCombined: false }
+          tiles[i][j] = { value: null, isCombined: false, isNew: false }
 
           moves.push({
             previous: { i, j },
@@ -247,13 +257,17 @@ function move(board: IBoard, direction: IDirection): IMove[] {
             tiles[i][nextJ - 1].value === tile.value &&
             !tiles[i][nextJ - 1].isCombined
           ) {
-            tiles[i][nextJ - 1] = { value: tile.value * 2, isCombined: true }
+            tiles[i][nextJ - 1] = {
+              value: tile.value * 2,
+              isCombined: true,
+              isNew: false,
+            }
           } else {
             if (nextJ === j) return
             tiles[i][nextJ] = { ...tile }
           }
 
-          tiles[i][j] = { value: null, isCombined: false }
+          tiles[i][j] = { value: null, isCombined: false, isNew: false }
 
           moves.push({
             previous: { i, j },
@@ -284,13 +298,17 @@ function move(board: IBoard, direction: IDirection): IMove[] {
             tiles[i][nextJ + 1].value === tile.value &&
             !tiles[i][nextJ + 1].isCombined
           ) {
-            tiles[i][nextJ + 1] = { value: tile.value * 2, isCombined: true }
+            tiles[i][nextJ + 1] = {
+              value: tile.value * 2,
+              isCombined: true,
+              isNew: false,
+            }
           } else {
             if (nextJ === j) return
             tiles[i][nextJ] = { ...tile }
           }
 
-          tiles[i][j] = { value: null, isCombined: false }
+          tiles[i][j] = { value: null, isCombined: false, isNew: false }
 
           moves.push({
             previous: { i, j },
@@ -358,7 +376,7 @@ function BoardReducer(
   state: IBoardContextState,
   action: IBoardContextAction,
 ): IBoardContextState {
-  resetCombinedStates(state.board)
+  resetCombinedAndNewStates(state.board)
 
   if (action.type === 'restart') {
     const board = createNewBoard()

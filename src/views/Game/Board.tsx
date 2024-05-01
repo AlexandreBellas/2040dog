@@ -1,16 +1,17 @@
 import { useBoard, useBoardDispatch } from '@contexts/BoardContext'
 import { Box, HStack, Text, VStack } from '@gluestack-ui/themed'
 import { IDirection } from '@interfaces/direction'
-import { useEffect } from 'react'
+import { memo, useEffect } from 'react'
 import { Alert, Platform } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { useSharedValue } from 'react-native-reanimated'
 
 import Tile from './Tile'
 
-export default function Board() {
+const Board = () => {
   // #region Contexts
-  const { board, isGameOver, hasWon, numOfMoves } = useBoard()
+  const { board, boardPreviousState, isGameOver, hasWon, numOfMoves } =
+    useBoard()
   const boardDispatch = useBoardDispatch()
   // #endregion
 
@@ -157,6 +158,7 @@ export default function Board() {
                   j={columnIdx}
                   value={tile.value}
                   hasBeenCombined={tile.isCombined}
+                  isNew={tile.isNew}
                 />
               ))}
             </HStack>
@@ -166,3 +168,5 @@ export default function Board() {
     </GestureDetector>
   )
 }
+
+export default memo(Board)

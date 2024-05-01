@@ -76,11 +76,7 @@ const styleMap: Record<number, ITileStyle> = {
   },
 }
 
-export default function tileColorByValue(value?: number | null): ITileStyle {
-  if (typeof value !== 'number') {
-    return { bgColor: '$trueGray300', textColor: '$trueGray300' }
-  }
-
+export default function tileColorByValue(value: number): ITileStyle {
   const color = styleMap[value]
   if (!color) throw new Error(`Invalid value: "${value}".`)
 
