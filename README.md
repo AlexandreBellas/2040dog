@@ -13,6 +13,6 @@ Inspired by the ideas of [Lia Kim Rodrigues](https://github.com/liakimr).
 - [x] Implement pieces combination when they have the same value
 - [x] Implement end-game conditions
 - [x] Add layout and styling structure
-- [-] Add dogs
-- [-] Add fluid in-game play
+- [ ] Add dogs
+- [ ] Add fluid in-game play
 - [ ] Add saving in local storage when played
