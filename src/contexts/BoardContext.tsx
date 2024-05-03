@@ -3,10 +3,12 @@ import { IDirection } from '@interfaces/direction'
 import { IMove } from '@interfaces/move'
 import { IPosition } from '@interfaces/position'
 import { ITile } from '@interfaces/tile'
+import BoardDatabaseService from '@services/database/board.database'
 import React, { createContext, useContext, useReducer } from 'react'
 
 // #region Context types
 interface IBoardProviderProps {
+  board?: IBoard
   children: JSX.Element
 }
 
@@ -348,11 +350,14 @@ export function useBoardHelpers() {
 // #endregion
 
 // #region Provider definitions
-export function BoardProvider({ children }: Readonly<IBoardProviderProps>) {
-  const board = createNewBoard()
+export function BoardProvider({
+  children,
+  board,
+}: Readonly<IBoardProviderProps>) {
+  const newBoard = board ?? createNewBoard()
   const initialState: IBoardContextState = {
-    board,
-    boardPreviousState: board,
+    board: newBoard,
+    boardPreviousState: newBoard,
     tilesLastMoves: [],
     hasWon: false,
     isGameOver: false,
@@ -379,6 +384,7 @@ function BoardReducer(
   resetCombinedAndNewStates(state.board)
 
   if (action.type === 'restart') {
+    BoardDatabaseService.delete()
     const board = createNewBoard()
     return {
       board,

@@ -95,8 +95,8 @@ const Tile = (props: Readonly<ITileProps>) => {
 
   // #region Styled components
   const AnimatedBox = styled(AnimatedView, {
-    minHeight: '$20',
-    minWidth: '$20',
+    minHeight: '$16',
+    minWidth: '$16',
     maxHeight: '$80',
     maxWidth: '$80',
     backgroundColor: bgColorNull,

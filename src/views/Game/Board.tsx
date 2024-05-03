@@ -1,6 +1,16 @@
 import { useBoard, useBoardDispatch } from '@contexts/BoardContext'
-import { Box, HStack, Text, VStack } from '@gluestack-ui/themed'
+import {
+  Box,
+  Button,
+  ButtonIcon,
+  HStack,
+  Text,
+  VStack,
+  View,
+} from '@gluestack-ui/themed'
 import { IDirection } from '@interfaces/direction'
+import BoardDatabaseService from '@services/database/board.database'
+import { RotateCcw } from 'lucide-react-native'
 import { memo, useEffect } from 'react'
 import { Alert, Platform } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
@@ -58,7 +68,7 @@ const Board = () => {
 
   // #region Effects
 
-  // Keyboard listener
+  // onKeyboardMove
   useEffect(() => {
     if (Platform.OS !== 'web') return
 
@@ -85,7 +95,8 @@ const Board = () => {
   useEffect(() => {
     if (isGameOver) return
     boardDispatch({ type: 'insert' })
-  }, [boardDispatch, numOfMoves, isGameOver])
+    BoardDatabaseService.save(board)
+  }, [board, boardDispatch, numOfMoves, isGameOver])
 
   // onEndGame
   useEffect(() => {
@@ -133,6 +144,41 @@ const Board = () => {
   return (
     <GestureDetector gesture={pan}>
       <Box alignItems="center" width="$full">
+        <View w="$full" alignItems="flex-end">
+          <Button
+            size="md"
+            variant="outline"
+            borderRadius="$lg"
+            borderWidth="$2"
+            action="secondary"
+            isFocusVisible={false}
+            onPress={() => {
+              const confirmationTitle = 'Are you sure?'
+              const confirmationMessage = 'Your progress will be lost. 🦴'
+              if (Platform.OS === 'web') {
+                if (confirm(`${confirmationTitle} ${confirmationMessage}`)) {
+                  boardDispatch({ type: 'restart' })
+                }
+
+                return
+              }
+
+              Alert.alert(confirmationTitle, confirmationMessage, [
+                {
+                  text: 'No',
+                },
+                {
+                  text: 'Restart',
+                  onPress: () => {
+                    boardDispatch({ type: 'restart' })
+                  },
+                },
+              ])
+            }}
+          >
+            <ButtonIcon as={RotateCcw} />
+          </Button>
+        </View>
         <Text fontFamily="$heading" fontSize="$6xl">
           2040🐶
         </Text>

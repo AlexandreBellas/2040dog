@@ -6,6 +6,7 @@
       "@helpers/*": ["./src/utils/helpers/*"],
       "@interfaces/*": ["./src/interfaces/*"],
       "@contexts/*": ["./src/contexts/*"],
+      "@services/*": ["./src/services/*"],
       "@views/*": ["./src/views/*"],
       "@layouts/*": ["./src/layouts/*"],
       "@assets/*": ["./assets/*"]
