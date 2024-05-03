@@ -11,10 +11,13 @@ import {
 import { IDirection } from '@interfaces/direction'
 import BoardDatabaseService from '@services/database/board.database'
 import { RotateCcw } from 'lucide-react-native'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Alert, Platform } from 'react-native'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { useSharedValue } from 'react-native-reanimated'
+import {
+  Directions,
+  Gesture,
+  GestureDetector,
+} from 'react-native-gesture-handler'
 
 import Tile from './Tile'
 
@@ -24,65 +27,52 @@ export default function Board() {
   const boardDispatch = useBoardDispatch()
   // #endregion
 
-  const [isMoveInTimeout, setIsMoveInTimeout] = useState(false)
-
   // #region Constant values
   const space = 'md'
-  const moveTimeout = 100
   // #endregion
 
   // #region Animation
-  const startXSlide = useSharedValue<number | null>(null)
-  const startYSlide = useSharedValue<number | null>(null)
-
-  const pan = Gesture.Pan()
-    .activeOffsetX([-80, 80])
-    .activeOffsetY([-80, 80])
+  const rightFlingGesture = Gesture.Fling()
+    .direction(Directions.RIGHT)
+    .numberOfPointers(1)
     .shouldCancelWhenOutside(true)
-    .onStart((e) => {
-      startXSlide.value = e.x
-      startYSlide.value = e.y
+    .runOnJS(true)
+    .onEnd(() => {
+      boardDispatch({ type: 'move', direction: 'right' })
     })
-    .onEnd((e) => {
-      if (isMoveInTimeout) return
-
-      const dx = e.x - (startXSlide.value ?? 0)
-      const dy = e.y - (startYSlide.value ?? 0)
-      if (dx === 0 && dy === 0) return
-
-      let boardAction: { type: 'move'; direction: IDirection }
-
-      if (Math.abs(dx) > Math.abs(dy)) {
-        boardAction =
-          dx > 0
-            ? { type: 'move', direction: 'right' }
-            : { type: 'move', direction: 'left' }
-      } else {
-        boardAction =
-          dy > 0
-            ? { type: 'move', direction: 'down' }
-            : { type: 'move', direction: 'up' }
-      }
-
-      setIsMoveInTimeout(true)
-      boardDispatch(boardAction)
+  const leftFlingGesture = Gesture.Fling()
+    .direction(Directions.LEFT)
+    .numberOfPointers(1)
+    .shouldCancelWhenOutside(true)
+    .runOnJS(true)
+    .onEnd(() => {
+      boardDispatch({ type: 'move', direction: 'left' })
     })
-    .onFinalize(() => {
-      startXSlide.value = null
-      startYSlide.value = null
+  const upFlingGesture = Gesture.Fling()
+    .direction(Directions.UP)
+    .numberOfPointers(1)
+    .shouldCancelWhenOutside(true)
+    .runOnJS(true)
+    .onEnd(() => {
+      boardDispatch({ type: 'move', direction: 'up' })
     })
+  const downFlingGesture = Gesture.Fling()
+    .direction(Directions.DOWN)
+    .numberOfPointers(1)
+    .shouldCancelWhenOutside(true)
+    .runOnJS(true)
+    .onEnd(() => {
+      boardDispatch({ type: 'move', direction: 'down' })
+    })
+  const moveGesture = Gesture.Race(
+    rightFlingGesture,
+    leftFlingGesture,
+    upFlingGesture,
+    downFlingGesture,
+  )
   // #endregion
 
   // #region Effects
-
-  // onMoveTimeout
-  useEffect(() => {
-    if (!isMoveInTimeout) return
-
-    setTimeout(() => {
-      setIsMoveInTimeout(false)
-    }, moveTimeout)
-  }, [isMoveInTimeout])
 
   // onKeyboardMove
   useEffect(() => {
@@ -158,7 +148,7 @@ export default function Board() {
   // #endregion
 
   return (
-    <GestureDetector gesture={pan}>
+    <GestureDetector gesture={moveGesture}>
       <Box alignItems="center" width="$full">
         <View w="$full" alignItems="flex-end">
           <Button
