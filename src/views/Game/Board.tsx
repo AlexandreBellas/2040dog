@@ -21,6 +21,17 @@ import {
 
 import Tile from './Tile'
 
+interface IGestureData {
+  [direction: string]: Directions
+}
+
+const gestureData: IGestureData = {
+  up: Directions.UP,
+  down: Directions.DOWN,
+  left: Directions.LEFT,
+  right: Directions.RIGHT,
+} as const
+
 export default function Board() {
   // #region Contexts
   const { board, isGameOver, hasWon, numOfMoves } = useBoard()
@@ -32,44 +43,18 @@ export default function Board() {
   // #endregion
 
   // #region Animation
-  const rightFlingGesture = Gesture.Fling()
-    .direction(Directions.RIGHT)
-    .numberOfPointers(1)
-    .shouldCancelWhenOutside(true)
-    .runOnJS(true)
-    .onEnd(() => {
-      boardDispatch({ type: 'move', direction: 'right' })
-    })
-  const leftFlingGesture = Gesture.Fling()
-    .direction(Directions.LEFT)
-    .numberOfPointers(1)
-    .shouldCancelWhenOutside(true)
-    .runOnJS(true)
-    .onEnd(() => {
-      boardDispatch({ type: 'move', direction: 'left' })
-    })
-  const upFlingGesture = Gesture.Fling()
-    .direction(Directions.UP)
-    .numberOfPointers(1)
-    .shouldCancelWhenOutside(true)
-    .runOnJS(true)
-    .onEnd(() => {
-      boardDispatch({ type: 'move', direction: 'up' })
-    })
-  const downFlingGesture = Gesture.Fling()
-    .direction(Directions.DOWN)
-    .numberOfPointers(1)
-    .shouldCancelWhenOutside(true)
-    .runOnJS(true)
-    .onEnd(() => {
-      boardDispatch({ type: 'move', direction: 'down' })
-    })
-  const moveGesture = Gesture.Race(
-    rightFlingGesture,
-    leftFlingGesture,
-    upFlingGesture,
-    downFlingGesture,
+  const gestures = Object.entries(gestureData).map(
+    ([direction, gestureDirection]) =>
+      Gesture.Fling()
+        .direction(gestureDirection)
+        .numberOfPointers(1)
+        .shouldCancelWhenOutside(true)
+        .runOnJS(true)
+        .onEnd(() => {
+          boardDispatch({ type: 'move', direction: direction as IDirection })
+        }),
   )
+  const moveGesture = Gesture.Race(...gestures)
   // #endregion
 
   // #region Effects
