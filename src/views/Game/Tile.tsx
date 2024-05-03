@@ -141,7 +141,11 @@ const Tile = (props: Readonly<ITileProps>) => {
         justifyContent="center"
       >
         {image && <TileImage source={image.source} alt={image.alt} />}
-        <Text color={textColor} fontSize="$3xl" fontWeight="$bold">
+        <Text
+          color={textColor}
+          fontSize={value && value >= 1024 ? '$xl' : '$3xl'}
+          fontWeight="$bold"
+        >
           {value}
         </Text>
       </AnimatedBox>

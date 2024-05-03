@@ -11,21 +11,24 @@ import {
 import { IDirection } from '@interfaces/direction'
 import BoardDatabaseService from '@services/database/board.database'
 import { RotateCcw } from 'lucide-react-native'
-import { memo, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, Platform } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { useSharedValue } from 'react-native-reanimated'
 
 import Tile from './Tile'
 
-const Board = () => {
+export default function Board() {
   // #region Contexts
   const { board, isGameOver, hasWon, numOfMoves } = useBoard()
   const boardDispatch = useBoardDispatch()
   // #endregion
 
+  const [isMoveInTimeout, setIsMoveInTimeout] = useState(false)
+
   // #region Constant values
   const space = 'md'
+  const moveTimeout = 100
   // #endregion
 
   // #region Animation
@@ -35,11 +38,14 @@ const Board = () => {
   const pan = Gesture.Pan()
     .activeOffsetX([-80, 80])
     .activeOffsetY([-80, 80])
+    .shouldCancelWhenOutside(true)
     .onStart((e) => {
       startXSlide.value = e.x
       startYSlide.value = e.y
     })
     .onEnd((e) => {
+      if (isMoveInTimeout) return
+
       const dx = e.x - (startXSlide.value ?? 0)
       const dy = e.y - (startYSlide.value ?? 0)
       if (dx === 0 && dy === 0) return
@@ -58,6 +64,7 @@ const Board = () => {
             : { type: 'move', direction: 'up' }
       }
 
+      setIsMoveInTimeout(true)
       boardDispatch(boardAction)
     })
     .onFinalize(() => {
@@ -67,6 +74,15 @@ const Board = () => {
   // #endregion
 
   // #region Effects
+
+  // onMoveTimeout
+  useEffect(() => {
+    if (!isMoveInTimeout) return
+
+    setTimeout(() => {
+      setIsMoveInTimeout(false)
+    }, moveTimeout)
+  }, [isMoveInTimeout])
 
   // onKeyboardMove
   useEffect(() => {
@@ -210,5 +226,3 @@ const Board = () => {
     </GestureDetector>
   )
 }
-
-export default memo(Board)
