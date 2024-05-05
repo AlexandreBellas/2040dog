@@ -59,24 +59,44 @@ const styleMap: Record<number, ITileStyle> = {
     },
   },
   128: {
-    bgColor: '#523f15',
+    bgColor: '#ab8738',
     textColor: '$white',
+    image: {
+      source: require('@assets/dogs/128.jpeg'),
+      alt: 'Golden retriever',
+    },
   },
   256: {
     bgColor: '$green400',
     textColor: '$black',
+    image: {
+      source: require('@assets/dogs/256.png'),
+      alt: 'Doberman',
+    },
   },
   512: {
     bgColor: '$cyan200',
     textColor: '$black',
+    image: {
+      source: require('@assets/dogs/512.jpeg'),
+      alt: 'Husky',
+    },
   },
   1024: {
     bgColor: '$indigo300',
     textColor: '$black',
+    image: {
+      source: require('@assets/dogs/1024.png'),
+      alt: 'German shepherd',
+    },
   },
   2048: {
-    bgColor: '$yellow300',
+    bgColor: '$yellow100',
     textColor: '$black',
+    image: {
+      source: require('@assets/dogs/2048.jpg'),
+      alt: 'Fubá',
+    },
   },
 }
 

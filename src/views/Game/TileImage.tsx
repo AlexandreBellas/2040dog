@@ -12,7 +12,7 @@ const TileImage = (props: Readonly<ITileImageProps>) => {
       w="$full"
       h="$full"
       position="absolute"
-      opacity="$10"
+      opacity="$30"
       source={props.source}
       alt={props.alt}
     />
