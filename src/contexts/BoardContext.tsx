@@ -9,7 +9,7 @@ import React, { createContext, useContext, useReducer } from 'react'
 // #region Context types
 interface IBoardProviderProps {
   board?: IBoard
-  children: JSX.Element
+  children: JSX.Element[]
 }
 
 interface IBoardContextState {
