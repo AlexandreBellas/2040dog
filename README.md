@@ -14,5 +14,5 @@ Inspired by the ideas of [Lia Kim Rodrigues](https://github.com/liakimr).
 - [x] Implement end-game conditions
 - [x] Add layout and styling structure
 - [x] Add saving in local storage when played
-- [ ] Add dogs
+- [x] Add dogs
 - [ ] Add fluid in-game play

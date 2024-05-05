@@ -31,7 +31,8 @@
     "react-native-reanimated": "~3.6.2",
     "react-native-svg": "^14.1.0",
     "react-native-web": "~0.19.6",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "expo-clipboard": "~5.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

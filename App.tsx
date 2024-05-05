@@ -8,9 +8,7 @@ import 'react-native-gesture-handler'
 export default function App() {
   return (
     <GluestackUIProvider config={config}>
-      <MultiplayerProvider>
-        {Platform.OS === 'web' ? <WebLayout /> : <></>}
-      </MultiplayerProvider>
+      {Platform.OS === 'web' ? <WebLayout /> : <></>}
     </GluestackUIProvider>
   )
 }
