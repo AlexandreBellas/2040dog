@@ -53,6 +53,10 @@ const styleMap: Record<number, ITileStyle> = {
   64: {
     bgColor: '#635e53',
     textColor: '$white',
+    image: {
+      source: require('@assets/dogs/64.jpg'),
+      alt: 'Bulldog',
+    },
   },
   128: {
     bgColor: '#523f15',
