@@ -4,11 +4,14 @@ import { IMove } from '@interfaces/move'
 import { IPosition } from '@interfaces/position'
 import { ITile } from '@interfaces/tile'
 import BoardDatabaseService from '@services/database/board.database'
+import PointsDatabaseService from '@services/database/points.database'
 import React, { createContext, useContext, useReducer } from 'react'
 
 // #region Context types
 interface IBoardProviderProps {
   board?: IBoard
+  currScore?: number
+  highestScore?: number
   children: JSX.Element
 }
 
@@ -19,6 +22,8 @@ interface IBoardContextState {
   isGameOver: boolean
   hasWon: boolean
   numOfMoves: number
+  currScore: number
+  highestScore: number
 }
 
 type IBoardContextAction =
@@ -338,6 +343,19 @@ function findGreatestTileValue(board: IBoard): number {
   }, 0)
 }
 
+function countPointsOfCombined(board: IBoard): number {
+  return board.tiles.reduce(
+    (prevTotalSum, currRow) =>
+      prevTotalSum +
+      currRow.reduce(
+        (prev, curr) =>
+          prev + (curr.isCombined && curr.value !== null ? curr.value : 0),
+        0,
+      ),
+    0,
+  )
+}
+
 // #endregion
 
 // #region Context definitions
@@ -365,6 +383,8 @@ export function useBoardHelpers() {
 export function BoardProvider({
   children,
   board,
+  currScore,
+  highestScore,
 }: Readonly<IBoardProviderProps>) {
   const newBoard = board ?? createNewBoard()
   const initialState: IBoardContextState = {
@@ -374,6 +394,8 @@ export function BoardProvider({
     hasWon: false,
     isGameOver: false,
     numOfMoves: 0,
+    currScore: currScore ?? 0,
+    highestScore: highestScore ?? 0,
   }
 
   const [state, dispatch] = useReducer(BoardReducer, initialState)
@@ -397,6 +419,7 @@ function BoardReducer(
 
   if (action.type === 'restart') {
     BoardDatabaseService.delete()
+
     const board = createNewBoard()
     return {
       board,
@@ -405,6 +428,8 @@ function BoardReducer(
       hasWon: false,
       isGameOver: false,
       numOfMoves: 0,
+      currScore: 0,
+      highestScore: state.highestScore,
     }
   }
 
@@ -417,6 +442,10 @@ function BoardReducer(
       const hasWon = doesBoardHave2048(state.board)
       const isGameOver = hasWon || !isPossibleToMove(state.board)
 
+      const newCurrScore = state.currScore + countPointsOfCombined(state.board)
+      const highestScore =
+        newCurrScore > state.highestScore ? newCurrScore : state.highestScore
+
       return {
         ...state,
         boardPreviousState,
@@ -424,6 +453,8 @@ function BoardReducer(
         hasWon,
         isGameOver,
         numOfMoves: state.numOfMoves + (moves.length > 0 ? 1 : 0),
+        currScore: newCurrScore,
+        highestScore,
       }
     }
     case 'insert': {

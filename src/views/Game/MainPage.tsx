@@ -35,6 +35,7 @@ import {
 import { IBoard } from '@interfaces/board'
 import { IDirection } from '@interfaces/direction'
 import BoardDatabaseService from '@services/database/board.database'
+import PointsDatabaseService from '@services/database/points.database'
 import * as Clipboard from 'expo-clipboard'
 import { Check } from 'lucide-react-native'
 import { DataConnection } from 'peerjs'
@@ -67,7 +68,8 @@ const gestureData: IGestureData = {
 export default function MainPage() {
   // #region Contexts
   const { createNewBoard, findGreatestTileValue } = useBoardHelpers()
-  const { board, isGameOver, numOfMoves, hasWon } = useBoard()
+  const { board, isGameOver, numOfMoves, hasWon, highestScore, currScore } =
+    useBoard()
   const boardDispatch = useBoardDispatch()
   const {
     peerInstance,
@@ -264,6 +266,9 @@ export default function MainPage() {
 
   // onAfterMove
   useEffect(() => {
+    PointsDatabaseService.setCurrScore(currScore)
+    PointsDatabaseService.setHighestScore(highestScore)
+
     if (isGameOver) return
     boardDispatch({ type: 'insert' })
 
@@ -282,6 +287,8 @@ export default function MainPage() {
     peerConnection,
     isMultiplayer,
     hasWon,
+    currScore,
+    highestScore,
   ])
 
   // onEndGame
@@ -558,6 +565,41 @@ export default function MainPage() {
                 </>
               )}
             </Box>
+
+            {!isMultiplayer && (
+              <HStack space="lg" marginTop="$2" w="$full" flex={1}>
+                <Box
+                  alignItems="center"
+                  borderRadius="$lg"
+                  backgroundColor="$trueGray100"
+                  py="$2"
+                  px="$4"
+                  flex={2}
+                >
+                  <Text fontWeight="$bold" fontSize="$md">
+                    Score
+                  </Text>
+                  <Text fontWeight="$black" fontSize="$xl">
+                    {currScore}
+                  </Text>
+                </Box>
+                <Box
+                  alignItems="center"
+                  borderRadius="$lg"
+                  backgroundColor="$trueGray300"
+                  py="$2"
+                  px="$4"
+                  flex={1}
+                >
+                  <Text fontWeight="$bold" fontSize="$md">
+                    Best
+                  </Text>
+                  <Text fontWeight="$black" fontSize="$xl">
+                    {highestScore}
+                  </Text>
+                </Box>
+              </HStack>
+            )}
           </Box>
         </View>
       </GestureDetector>
