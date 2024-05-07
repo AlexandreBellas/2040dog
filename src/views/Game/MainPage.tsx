@@ -643,7 +643,7 @@ export default function MainPage() {
                   multiplayerConnectToPeer()
                 }}
               >
-                <ButtonText>Submit</ButtonText>
+                <ButtonText>Connect</ButtonText>
               </Button>
             </ModalFooter>
           </ModalContent>
