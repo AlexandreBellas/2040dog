@@ -250,7 +250,6 @@ export default function MainPage() {
 
   // onEndGame
   useEffect(() => {
-    console.log('onEndGame')
     if (isMultiplayer && remoteIsGameOver) {
       if (remoteHasWon) {
         if (Platform.OS === 'web') {

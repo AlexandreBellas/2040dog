@@ -66,7 +66,7 @@ export const useMultiplayerDispatch = () =>
 export default function MultiplayerProvider({
   children,
 }: Readonly<IMultiplayerProviderProps>) {
-  const currPlayerId = uuidv4()
+  const currPlayerId = `2040dog+${uuidv4()}`
   const peer = new Peer(currPlayerId)
 
   const initialState: IMultiplayerContextState = {
