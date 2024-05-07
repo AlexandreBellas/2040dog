@@ -209,6 +209,12 @@ export default function MainPage() {
   )
 
   function multiplayerConnectToPeer() {
+    if (typeRemotePlayerId === currPlayerId) {
+      setIsConnectingToPlayer(false)
+      setHasConnectionError(true)
+      return
+    }
+
     const conn = peerInstance.connect(typeRemotePlayerId)
 
     if (conn === undefined) {
