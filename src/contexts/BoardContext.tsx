@@ -326,6 +326,18 @@ function move(board: IBoard, direction: IDirection): IMove[] {
   return moves
 }
 
+function findGreatestTileValue(board: IBoard): number {
+  return board.tiles.reduce((prevGreatest, currRow) => {
+    const greatestInRow = currRow.reduce(
+      (prev, curr) =>
+        curr.value !== null && curr.value > prev ? curr.value : prev,
+      0,
+    )
+
+    return greatestInRow > prevGreatest ? greatestInRow : prevGreatest
+  }, 0)
+}
+
 // #endregion
 
 // #region Context definitions
@@ -345,7 +357,7 @@ export function useBoardDispatch() {
 }
 
 export function useBoardHelpers() {
-  return { getTile, isBoardFull }
+  return { getTile, isBoardFull, createNewBoard, findGreatestTileValue }
 }
 // #endregion
 

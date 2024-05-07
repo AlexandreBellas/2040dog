@@ -15,6 +15,8 @@ interface IMultiplayerContextState {
   currPlayerId: string
   remotePlayerId?: string
   remoteBoard?: IBoard
+  remoteIsGameOver?: boolean
+  remoteHasWon?: boolean
 }
 
 type IMultiplayerContextAction =
@@ -22,6 +24,7 @@ type IMultiplayerContextAction =
       type: 'set-active-type'
       activeType: 'versus' | 'co-op'
       remotePlayerId: string
+      connection?: DataConnection
     }
   | {
       type: 'set-active-type'
@@ -37,6 +40,8 @@ type IMultiplayerContextAction =
   | {
       type: 'set-remote-board'
       board: IBoard
+      isGameOver: boolean
+      hasWon: boolean
     }
 // #endregion
 
@@ -68,7 +73,6 @@ export default function MultiplayerProvider({
     activeType: 'single',
     currPlayerId,
     peerInstance: peer,
-    remotePlayerId: undefined,
   }
 
   const [state, dispatch] = useReducer(multiplayerReducer, initialState)
@@ -102,6 +106,7 @@ function multiplayerReducer(
         ...state,
         activeType: action.activeType,
         remotePlayerId: action.remotePlayerId,
+        peerConnection: action.connection ?? state.peerConnection,
       }
     }
     case 'set-connection': {
@@ -124,6 +129,8 @@ function multiplayerReducer(
       return {
         ...state,
         remoteBoard: action.board,
+        remoteHasWon: action.hasWon,
+        remoteIsGameOver: action.isGameOver,
       }
     }
     default: {
