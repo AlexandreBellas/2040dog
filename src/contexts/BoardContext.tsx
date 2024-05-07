@@ -4,7 +4,6 @@ import { IMove } from '@interfaces/move'
 import { IPosition } from '@interfaces/position'
 import { ITile } from '@interfaces/tile'
 import BoardDatabaseService from '@services/database/board.database'
-import PointsDatabaseService from '@services/database/points.database'
 import React, { createContext, useContext, useReducer } from 'react'
 
 // #region Context types
