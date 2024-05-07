@@ -107,6 +107,18 @@ export default function MainPage() {
   // #endregion
 
   // #region Callbacks
+  const resetMultiplayerStatus = useCallback(() => {
+    setIsMultiplayer(false)
+    setIsConfiguringMultiplayer(false)
+    setHasConnectionError(true)
+    setIsConnectingToPlayer(false)
+
+    peerConnection?.close()
+
+    multiplayerDispatch({ type: 'remove-connection' })
+    boardDispatch({ type: 'restart' })
+  }, [multiplayerDispatch, boardDispatch, peerConnection])
+
   const multiplayerConfigure = useCallback(
     (peerConnection: DataConnection) => {
       // Open
@@ -159,10 +171,6 @@ export default function MainPage() {
       // Error
       peerConnection.on('error', (error) => {
         console.log('connection errored!', error)
-        setIsMultiplayer(false)
-        setIsConfiguringMultiplayer(false)
-        setHasConnectionError(true)
-        setIsConnectingToPlayer(false)
 
         if (Platform.OS === 'web') {
           alert('Connection error with peer.')
@@ -170,14 +178,12 @@ export default function MainPage() {
           Alert.alert('Connection error', 'Connection had error with peer.')
         }
 
-        multiplayerDispatch({ type: 'remove-connection' })
-        boardDispatch({ type: 'restart' })
+        resetMultiplayerStatus()
       })
 
       // Close
       peerConnection.on('close', () => {
         console.log('connection closed!')
-        setIsMultiplayer(false)
 
         if (Platform.OS === 'web') {
           alert('Connection closed with peer.')
@@ -188,15 +194,34 @@ export default function MainPage() {
           )
         }
 
-        multiplayerDispatch({ type: 'remove-connection' })
-        boardDispatch({ type: 'restart' })
+        resetMultiplayerStatus()
       })
     },
-    [multiplayerDispatch, createNewBoard, boardDispatch],
+    [
+      multiplayerDispatch,
+      createNewBoard,
+      boardDispatch,
+      resetMultiplayerStatus,
+    ],
   )
 
   function multiplayerConnectToPeer() {
     const conn = peerInstance.connect(typeRemotePlayerId)
+
+    if (conn === undefined) {
+      if (Platform.OS === 'web') {
+        alert('It was not possible to connect to peer. Check the provided ID.')
+      } else {
+        Alert.alert(
+          'Connection error',
+          'It was not possible to connect to peer. Check the provided ID.',
+        )
+      }
+
+      resetMultiplayerStatus()
+      return
+    }
+
     multiplayerConfigure(conn)
   }
   // #endregion
@@ -393,7 +418,6 @@ export default function MainPage() {
     // Received connection
     peerInstance.on('connection', (conn) => {
       console.log('received connection!')
-
       multiplayerConfigure(conn)
     })
 
@@ -402,7 +426,6 @@ export default function MainPage() {
       if (!isMultiplayer) return
 
       console.log('disconnected!', currentId)
-      setIsMultiplayer(false)
 
       if (Platform.OS === 'web') {
         alert('Disconnected from peer.')
@@ -410,8 +433,7 @@ export default function MainPage() {
         Alert.alert('Disconnected', 'You disconnected from the peer.')
       }
 
-      multiplayerDispatch({ type: 'remove-connection' })
-      boardDispatch({ type: 'restart' })
+      resetMultiplayerStatus()
     })
   }, [
     peerInstance,
@@ -419,6 +441,7 @@ export default function MainPage() {
     multiplayerConfigure,
     boardDispatch,
     isMultiplayer,
+    resetMultiplayerStatus,
   ])
 
   // #endregion
