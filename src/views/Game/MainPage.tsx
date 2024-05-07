@@ -213,11 +213,13 @@ export default function MainPage() {
 
     if (conn === undefined) {
       if (Platform.OS === 'web') {
-        alert('It was not possible to connect to peer. Check the provided ID.')
+        alert(
+          'It was not possible to connect to peer. Reload the page or check the provided ID.',
+        )
       } else {
         Alert.alert(
           'Connection error',
-          'It was not possible to connect to peer. Check the provided ID.',
+          'It was not possible to connect to peer. Reload the app or check the provided ID.',
         )
       }
 
@@ -420,7 +422,7 @@ export default function MainPage() {
   useEffect(() => {
     // Received connection
     peerInstance.on('connection', (conn) => {
-      console.log('received connection!')
+      setIsConfiguringMultiplayer(true)
       multiplayerConfigure(conn)
     })
 
