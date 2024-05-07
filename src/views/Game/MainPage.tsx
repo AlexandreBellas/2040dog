@@ -107,17 +107,20 @@ export default function MainPage() {
   // #endregion
 
   // #region Callbacks
-  const resetMultiplayerStatus = useCallback(() => {
-    setIsMultiplayer(false)
-    setIsConfiguringMultiplayer(false)
-    setHasConnectionError(true)
-    setIsConnectingToPlayer(false)
+  const resetMultiplayerStatus = useCallback(
+    (hasError: boolean) => {
+      setIsMultiplayer(false)
+      setIsConfiguringMultiplayer(false)
+      setHasConnectionError(hasError)
+      setIsConnectingToPlayer(false)
 
-    peerConnection?.close()
+      peerConnection?.close()
 
-    multiplayerDispatch({ type: 'remove-connection' })
-    boardDispatch({ type: 'restart' })
-  }, [multiplayerDispatch, boardDispatch, peerConnection])
+      multiplayerDispatch({ type: 'remove-connection' })
+      boardDispatch({ type: 'restart' })
+    },
+    [multiplayerDispatch, boardDispatch, peerConnection],
+  )
 
   const multiplayerConfigure = useCallback(
     (peerConnection: DataConnection) => {
@@ -178,7 +181,7 @@ export default function MainPage() {
           Alert.alert('Connection error', 'Connection had error with peer.')
         }
 
-        resetMultiplayerStatus()
+        resetMultiplayerStatus(true)
       })
 
       // Close
@@ -194,7 +197,7 @@ export default function MainPage() {
           )
         }
 
-        resetMultiplayerStatus()
+        resetMultiplayerStatus(false)
       })
     },
     [
@@ -218,7 +221,7 @@ export default function MainPage() {
         )
       }
 
-      resetMultiplayerStatus()
+      resetMultiplayerStatus(true)
       return
     }
 
@@ -426,14 +429,13 @@ export default function MainPage() {
       if (!isMultiplayer) return
 
       console.log('disconnected!', currentId)
-
       if (Platform.OS === 'web') {
         alert('Disconnected from peer.')
       } else {
         Alert.alert('Disconnected', 'You disconnected from the peer.')
       }
 
-      resetMultiplayerStatus()
+      resetMultiplayerStatus(false)
     })
   }, [
     peerInstance,

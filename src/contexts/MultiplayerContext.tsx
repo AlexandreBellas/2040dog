@@ -70,8 +70,24 @@ export default function MultiplayerProvider({
   const peer = new Peer(currPlayerId, {
     config: {
       iceServers: [
+        { urls: 'stun:stun.relay.metered.ca:80' },
         {
           urls: 'turn:global.relay.metered.ca:80',
+          username: 'fad8157c3c3294f670891975',
+          credential: 'VCQqHCzv9xZqG+Y/',
+        },
+        {
+          urls: 'turn:global.relay.metered.ca:80?transport=tcp',
+          username: 'fad8157c3c3294f670891975',
+          credential: 'VCQqHCzv9xZqG+Y/',
+        },
+        {
+          urls: 'turn:global.relay.metered.ca:443',
+          username: 'fad8157c3c3294f670891975',
+          credential: 'VCQqHCzv9xZqG+Y/',
+        },
+        {
+          urls: 'turns:global.relay.metered.ca:443?transport=tcp',
           username: 'fad8157c3c3294f670891975',
           credential: 'VCQqHCzv9xZqG+Y/',
         },
@@ -128,6 +144,8 @@ function multiplayerReducer(
       }
     }
     case 'remove-connection': {
+      state.peerConnection?.close()
+
       return {
         ...state,
         peerConnection: undefined,
