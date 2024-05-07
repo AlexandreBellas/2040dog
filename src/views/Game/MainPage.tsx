@@ -115,6 +115,7 @@ export default function MainPage() {
         setHasConnectionError(false)
         setIsConnectingToPlayer(false)
         setIsMultiplayer(true)
+        setHasCopiedCurrId(false)
 
         multiplayerDispatch({
           type: 'set-active-type',
@@ -249,10 +250,13 @@ export default function MainPage() {
 
   // onEndGame
   useEffect(() => {
+    console.log('onEndGame')
     if (isMultiplayer && remoteIsGameOver) {
       if (remoteHasWon) {
         if (Platform.OS === 'web') {
           alert('Oh no! You lost to your opponent 🥲🐶')
+          peerConnection?.close()
+          boardDispatch({ type: 'restart' })
           return
         }
 
@@ -278,7 +282,7 @@ export default function MainPage() {
         return
       }
 
-      Alert.alert('You lost to your opponent 🥲', 'You won.', [
+      Alert.alert('Congratulations!', 'Your opponent lost 😅', [
         {
           text: 'Close',
           onPress: () => {
@@ -294,9 +298,12 @@ export default function MainPage() {
     if (!isGameOver) return
 
     if (isMultiplayer) {
+      peerConnection?.send({ board, hasWon, isGameOver })
       if (hasWon) {
         if (Platform.OS === 'web') {
           alert('Congratulations! You won your opponent 😎🐶')
+          peerConnection?.close()
+          boardDispatch({ type: 'restart' })
           return
         }
 
@@ -378,6 +385,8 @@ export default function MainPage() {
     hasWon,
     remoteHasWon,
     remoteIsGameOver,
+    remoteBoard,
+    board,
   ])
 
   // onConfigurePeerConnection
@@ -426,6 +435,7 @@ export default function MainPage() {
             borderWidth="$4"
             borderColor="$white"
             p="$4"
+            mt="$2"
             alignItems="center"
             sx={{
               ...(isBrowser
@@ -524,6 +534,7 @@ export default function MainPage() {
         isOpen={isConfiguringMultiplayer}
         onClose={() => {
           setIsConfiguringMultiplayer(false)
+          setHasCopiedCurrId(false)
         }}
       >
         <ModalBackdrop />
@@ -580,6 +591,7 @@ export default function MainPage() {
                 mr="$3"
                 onPress={() => {
                   setIsConfiguringMultiplayer(false)
+                  setHasCopiedCurrId(false)
                 }}
               >
                 <ButtonText>Cancel</ButtonText>
@@ -594,6 +606,7 @@ export default function MainPage() {
 
                   setIsConnectingToPlayer(true)
                   setHasConnectionError(false)
+                  setHasCopiedCurrId(false)
 
                   multiplayerConnectToPeer()
                 }}
