@@ -1,11 +1,11 @@
 import { IBoard } from '@interfaces/board'
 import Peer, { DataConnection } from 'peerjs'
 import React, { createContext, useContext, useReducer } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 
 // #region Context types
 interface IMultiplayerProviderProps {
   children: JSX.Element
+  currPlayerId: string
 }
 
 interface IMultiplayerContextState {
@@ -65,9 +65,19 @@ export const useMultiplayerDispatch = () =>
 // #region Provider definitions
 export default function MultiplayerProvider({
   children,
+  currPlayerId,
 }: Readonly<IMultiplayerProviderProps>) {
-  const currPlayerId = `2040dog-${uuidv4()}`
-  const peer = new Peer(currPlayerId)
+  const peer = new Peer(currPlayerId, {
+    config: {
+      iceServers: [
+        {
+          urls: 'turn:global.relay.metered.ca:80',
+          username: 'fad8157c3c3294f670891975',
+          credential: 'VCQqHCzv9xZqG+Y/',
+        },
+      ],
+    },
+  })
 
   const initialState: IMultiplayerContextState = {
     activeType: 'single',
