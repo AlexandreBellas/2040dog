@@ -576,9 +576,7 @@ export default function MainPage() {
                   px="$4"
                   flex={2}
                 >
-                  <Text fontWeight="$bold" fontSize="$md">
-                    Score
-                  </Text>
+                  <Text fontSize="$md">Score</Text>
                   <Text fontWeight="$black" fontSize="$xl">
                     {currScore}
                   </Text>
@@ -591,9 +589,7 @@ export default function MainPage() {
                   px="$4"
                   flex={1}
                 >
-                  <Text fontWeight="$bold" fontSize="$md">
-                    Best
-                  </Text>
+                  <Text fontSize="$md">Best</Text>
                   <Text fontWeight="$black" fontSize="$xl">
                     {highestScore}
                   </Text>
