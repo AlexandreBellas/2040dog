@@ -17,4 +17,4 @@ Inspired by the ideas of [Lia Kim Rodrigues](https://github.com/liakimr).
 - [x] Add saving in local storage when played
 - [x] Add dogs
 - [x] Add high score functionality
-- [ ] Add fluid in-game play
+- [x] Add fluid in-game play
