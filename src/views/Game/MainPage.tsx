@@ -269,12 +269,12 @@ export default function MainPage() {
     PointsDatabaseService.setCurrScore(currScore)
     PointsDatabaseService.setHighestScore(highestScore)
 
-    if (isGameOver) return
-    boardDispatch({ type: 'insert' })
-
     if (!isMultiplayer) {
       BoardDatabaseService.save(board)
     }
+
+    if (isGameOver) return
+    boardDispatch({ type: 'insert' })
 
     if (isMultiplayer && peerConnection) {
       peerConnection.send({ board, isGameOver, hasWon })
