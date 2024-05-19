@@ -1,5 +1,5 @@
 import { AnimatedView } from '@gluestack-style/animation-resolver'
-import { Box, Text, styled } from '@gluestack-ui/themed'
+import { Text, styled } from '@gluestack-ui/themed'
 import tileColorByValue from '@helpers/tile-color-by-value'
 import { memo, useEffect, useMemo, useState } from 'react'
 
@@ -95,10 +95,9 @@ const Tile = (props: Readonly<ITileProps>) => {
 
   // #region Styled components
   const AnimatedBox = styled(AnimatedView, {
-    minHeight: '$16',
-    minWidth: '$16',
-    maxHeight: '$80',
-    maxWidth: '$80',
+    h: '$16',
+    w: '$16',
+    margin: '$1',
     backgroundColor: bgColorNull,
     ':initial': { scale: startScale },
     ':animate': { scale: stopScale },
@@ -117,39 +116,35 @@ const Tile = (props: Readonly<ITileProps>) => {
 
   if (isNew && isNewAnimationState === 0) {
     return (
-      <Box backgroundColor={bgColorNull} borderRadius="$md">
-        <AnimatedBox
-          key={`${i}-${j}`}
-          backgroundColor={bgColorNull}
-          borderRadius="$md"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Text />
-        </AnimatedBox>
-      </Box>
-    )
-  }
-
-  return (
-    <Box backgroundColor={bgColorNull} borderRadius="$md">
       <AnimatedBox
         key={`${i}-${j}`}
-        backgroundColor={bgColor}
+        backgroundColor={bgColorNull}
         borderRadius="$md"
         alignItems="center"
         justifyContent="center"
       >
-        {image && <TileImage source={image.source} alt={image.alt} />}
-        <Text
-          color={textColor}
-          fontSize={value && value >= 1024 ? '$xl' : '$3xl'}
-          fontWeight="$bold"
-        >
-          {value}
-        </Text>
+        <Text />
       </AnimatedBox>
-    </Box>
+    )
+  }
+
+  return (
+    <AnimatedBox
+      key={`${i}-${j}`}
+      backgroundColor={bgColor}
+      borderRadius="$md"
+      alignItems="center"
+      justifyContent="center"
+    >
+      {image && <TileImage source={image.source} alt={image.alt} />}
+      <Text
+        color={textColor}
+        fontSize={value && value >= 1024 ? '$xl' : '$3xl'}
+        fontWeight="$bold"
+      >
+        {value}
+      </Text>
+    </AnimatedBox>
   )
 }
 

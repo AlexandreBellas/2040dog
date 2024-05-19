@@ -2,9 +2,9 @@ import { IBoard } from '@interfaces/board'
 import { IDirection } from '@interfaces/direction'
 import { IMove } from '@interfaces/move'
 import { IPosition } from '@interfaces/position'
-import { v4 as uuidv4 } from 'uuid'
 import BoardDatabaseService from '@services/database/board.database'
 import React, { createContext, useContext, useReducer } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 // #region Context types
 interface IBoardProviderProps {
@@ -27,18 +27,18 @@ interface IBoardContextState {
 
 type IBoardContextAction =
   | {
-    type: 'move'
-    direction: IDirection
-  }
+      type: 'move'
+      direction: IDirection
+    }
   | {
-    type: 'insert'
-  }
+      type: 'insert'
+    }
   | {
-    type: 'restart'
-  }
+      type: 'restart'
+    }
   | {
-    type: 'clean-up'
-  }
+      type: 'clean-up'
+    }
 // #endregion
 
 // #region Constant variables
@@ -78,19 +78,18 @@ function createTestBoard(): IBoard {
         { value: 2048, isCombined: false, isNew: false, ids: [uuidv4()] },
         null,
       ],
-      [
-        null,
-        null,
-        null,
-        null,
-      ],
+      [null, null, null, null],
     ],
   }
 }
 
 function deepCopyBoard(board: IBoard): IBoard {
   return {
-    tiles: [...board.tiles.map((row) => [...row.map((tile) => tile === null ? null : { ...tile })])],
+    tiles: [
+      ...board.tiles.map((row) => [
+        ...row.map((tile) => (tile === null ? null : { ...tile })),
+      ]),
+    ],
   }
 }
 
@@ -195,9 +194,8 @@ function move(board: IBoard, direction: IDirection): IMove[] {
               value: tile.value * 2,
               isCombined: true,
               isNew: false,
-              ids: [tiles[nextI - 1][j]!.ids[0], tile.ids[0]]
+              ids: [tiles[nextI - 1][j]!.ids[0], tile.ids[0]],
             }
-
           } else {
             if (nextI === i) return
             tiles[nextI][j] = { ...tile }
@@ -227,10 +225,7 @@ function move(board: IBoard, direction: IDirection): IMove[] {
           if (i === boardLength - 1 || tile === null) return
 
           let nextI = i
-          while (
-            nextI < boardLength - 1 &&
-            tiles[nextI + 1][j] === null
-          ) {
+          while (nextI < boardLength - 1 && tiles[nextI + 1][j] === null) {
             nextI++
           }
 
@@ -243,7 +238,7 @@ function move(board: IBoard, direction: IDirection): IMove[] {
               value: tile.value * 2,
               isCombined: true,
               isNew: false,
-              ids: [tiles[nextI + 1][j]!.ids[0], tile.ids[0]]
+              ids: [tiles[nextI + 1][j]!.ids[0], tile.ids[0]],
             }
           } else {
             if (nextI === i) return
@@ -280,7 +275,7 @@ function move(board: IBoard, direction: IDirection): IMove[] {
               value: tile.value * 2,
               isCombined: true,
               isNew: false,
-              ids: [tiles[i][nextJ - 1]!.ids[0], tile.ids[0]]
+              ids: [tiles[i][nextJ - 1]!.ids[0], tile.ids[0]],
             }
           } else {
             if (nextJ === j) return
@@ -322,7 +317,7 @@ function move(board: IBoard, direction: IDirection): IMove[] {
               value: tile.value * 2,
               isCombined: true,
               isNew: false,
-              ids: [tiles[i][nextJ + 1]!.ids[0], tile.ids[0]]
+              ids: [tiles[i][nextJ + 1]!.ids[0], tile.ids[0]],
             }
           } else {
             if (nextJ === j) return
@@ -348,8 +343,7 @@ function move(board: IBoard, direction: IDirection): IMove[] {
 function findGreatestTileValue(board: IBoard): number {
   return board.tiles.reduce((prevGreatest, currRow) => {
     const greatestInRow = currRow.reduce(
-      (prev, curr) =>
-        curr !== null && curr.value > prev ? curr.value : prev,
+      (prev, curr) => (curr !== null && curr.value > prev ? curr.value : prev),
       0,
     )
 
@@ -481,7 +475,8 @@ function BoardReducer(
         isGameOver: !isPossibleToMove(state.board),
       }
     }
-    default: { // includes 'clean-up'
+    default: {
+      // includes 'clean-up'
       return state
     }
   }
