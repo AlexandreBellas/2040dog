@@ -1,5 +1,6 @@
 export interface ITile {
-  value: number | null
+  ids: string[]
+  value: number
   isCombined: boolean
   isNew: boolean
 }

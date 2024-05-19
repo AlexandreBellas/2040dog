@@ -32,9 +32,9 @@ export default function Board(props: Readonly<IBoardProps>) {
               key={`tiles-column-${rowIdx}-${columnIdx}`}
               i={rowIdx}
               j={columnIdx}
-              value={tile.value}
-              hasBeenCombined={tile.isCombined}
-              isNew={tile.isNew}
+              value={tile?.value}
+              hasBeenCombined={tile?.isCombined ?? false}
+              isNew={tile?.isNew ?? false}
             />
           ))}
         </HStack>
