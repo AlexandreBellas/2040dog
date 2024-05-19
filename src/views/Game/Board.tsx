@@ -39,16 +39,20 @@ export default function Board(props: Readonly<IBoardProps>) {
         >
           {board.tiles.map((row, rowIdx) =>
             row.map((tile, columnIdx) => {
-              if (id === 'bg') return <BackgroundTile />
+              if (id === 'bg') {
+                return (
+                  <BackgroundTile key={`tiles-column-${rowIdx}-${columnIdx}`} />
+                )
+              }
+
+              if (tile === null) return false
 
               return (
                 <Tile
-                  key={`tiles-column-${rowIdx}-${columnIdx}`}
+                  key={`tiles-column-${tile?.ids[0] ?? `${rowIdx}-${columnIdx}`}`}
                   i={rowIdx}
                   j={columnIdx}
-                  value={tile?.value}
-                  hasBeenCombined={tile?.isCombined ?? false}
-                  isNew={tile?.isNew ?? false}
+                  tile={tile}
                 />
               )
             }),

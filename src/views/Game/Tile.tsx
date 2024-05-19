@@ -1,6 +1,7 @@
 import { AnimatedView } from '@gluestack-style/animation-resolver'
 import { Text, styled } from '@gluestack-ui/themed'
 import tileColorByValue from '@helpers/tile-color-by-value'
+import { ITile } from '@interfaces/tile'
 import { memo, useEffect, useMemo, useState } from 'react'
 
 import TileImage from './TileImage'
@@ -8,14 +9,13 @@ import TileImage from './TileImage'
 interface ITileProps {
   i: number
   j: number
-  value?: number | null
-  hasBeenCombined: boolean
-  isNew: boolean
+  tile: ITile
 }
 
 const Tile = (props: Readonly<ITileProps>) => {
   // #region Props
-  const { value, hasBeenCombined, isNew, i, j } = props
+  const { tile, i, j } = props
+  const { isCombined: hasBeenCombined, isNew, value } = tile
   // #endregion
 
   // #region Constant variables
@@ -130,7 +130,6 @@ const Tile = (props: Readonly<ITileProps>) => {
 
   return (
     <AnimatedBox
-      key={`${i}-${j}`}
       backgroundColor={bgColor}
       borderRadius="$md"
       alignItems="center"
@@ -149,12 +148,18 @@ const Tile = (props: Readonly<ITileProps>) => {
 }
 
 export default memo(Tile, (prev, next) => {
-  if (prev.isNew && !next.isNew && prev.value === next.value) return true
+  if (
+    prev.tile.isNew &&
+    !next.tile.isNew &&
+    prev.tile.value === next.tile.value
+  ) {
+    return true
+  }
 
   return (
-    prev.hasBeenCombined === next.hasBeenCombined &&
-    prev.value === next.value &&
-    prev.isNew === next.isNew &&
+    prev.tile.isCombined === next.tile.isCombined &&
+    prev.tile.value === next.tile.value &&
+    prev.tile.isNew === next.tile.isNew &&
     prev.i === next.i &&
     prev.j === next.j
   )
