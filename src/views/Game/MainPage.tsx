@@ -36,7 +36,9 @@ import { IBoard } from '@interfaces/board'
 import { IDirection } from '@interfaces/direction'
 import BoardDatabaseService from '@services/database/board.database'
 import PointsDatabaseService from '@services/database/points.database'
+import { moveAnimationDuration } from '@utils/constants/animation'
 import * as Clipboard from 'expo-clipboard'
+import { throttle } from 'lodash'
 import { Check } from 'lucide-react-native'
 import { DataConnection } from 'peerjs'
 import { useCallback, useEffect, useState } from 'react'
@@ -102,7 +104,7 @@ export default function MainPage() {
         .shouldCancelWhenOutside(true)
         .runOnJS(true)
         .onEnd(() => {
-          boardDispatch({ type: 'move', direction: direction as IDirection })
+          move(direction as IDirection)
         }),
   )
   const moveGesture = Gesture.Race(...gestures)
@@ -210,6 +212,18 @@ export default function MainPage() {
     ],
   )
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const move = useCallback(
+    throttle(
+      (direction: IDirection) => {
+        boardDispatch({ type: 'move', direction })
+      },
+      moveAnimationDuration * 1.05,
+      { trailing: false },
+    ),
+    [boardDispatch],
+  )
+
   function multiplayerConnectToPeer() {
     if (typeRemotePlayerId === currPlayerId) {
       setIsConnectingToPlayer(false)
@@ -257,12 +271,13 @@ export default function MainPage() {
       if (direction === undefined) return
 
       e.preventDefault()
-      boardDispatch({ type: 'move', direction })
+
+      move(direction)
     }
 
     window.addEventListener('keydown', keyDownHandler)
     return () => window.removeEventListener('keydown', keyDownHandler)
-  }, [boardDispatch])
+  }, [move])
 
   // onAfterMove
   useEffect(() => {
@@ -274,7 +289,9 @@ export default function MainPage() {
     }
 
     if (isGameOver) return
-    boardDispatch({ type: 'insert' })
+    setTimeout(() => {
+      boardDispatch({ type: 'insert' })
+    }, moveAnimationDuration)
 
     if (isMultiplayer && peerConnection) {
       peerConnection.send({ board, isGameOver, hasWon })
@@ -521,7 +538,7 @@ export default function MainPage() {
 
             <GameHeading />
 
-            <Box alignItems="center" width="$full">
+            <Box alignItems="center" width="$full" height={302}>
               {!isMultiplayer ? (
                 <Board board={board} />
               ) : (
@@ -554,9 +571,12 @@ export default function MainPage() {
                           <Tile
                             i={0}
                             j={0}
-                            value={findGreatestTileValue(remoteBoard)}
-                            hasBeenCombined={false}
-                            isNew={false}
+                            tile={{
+                              value: findGreatestTileValue(remoteBoard),
+                              isCombined: false,
+                              isNew: false,
+                              ids: [''],
+                            }}
                           />
                         </View>
                       )}

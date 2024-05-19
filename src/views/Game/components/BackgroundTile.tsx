@@ -1,6 +1,7 @@
 import { Box, Text } from '@gluestack-ui/themed'
+import { memo } from 'react'
 
-export default function BackgroundTile() {
+const BackgroundTile = () => {
   return (
     <Box
       backgroundColor="$trueGray300"
@@ -13,3 +14,5 @@ export default function BackgroundTile() {
     </Box>
   )
 }
+
+export default memo(BackgroundTile)

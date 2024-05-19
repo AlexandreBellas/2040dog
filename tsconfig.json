@@ -10,7 +10,8 @@
       "@views/*": ["./src/views/*"],
       "@layouts/*": ["./src/layouts/*"],
       "@assets/*": ["./assets/*"],
-      "@utils/*": ["./src/utils/*"]
+      "@utils/*": ["./src/utils/*"],
+      "@hooks/*": ["./src/hooks/*"],
     }
   },
   "include": ["**/*.ts", "**/*.tsx"]

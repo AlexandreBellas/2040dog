@@ -9,6 +9,7 @@ interface ITileImageProps {
 const TileImage = (props: Readonly<ITileImageProps>) => {
   return (
     <Image
+      borderRadius={8}
       w="$full"
       h="$full"
       position="absolute"

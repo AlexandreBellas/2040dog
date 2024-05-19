@@ -20,7 +20,9 @@
     "@gluestack-ui/themed": "^1.1.22",
     "@react-native-async-storage/async-storage": "1.21.0",
     "expo": "~50.0.14",
+    "expo-clipboard": "~5.0.1",
     "expo-status-bar": "~1.11.1",
+    "lodash": "^4.17.21",
     "lucide-react-native": "^0.377.0",
     "peerjs": "^1.5.2",
     "react": "18.2.0",
@@ -31,11 +33,11 @@
     "react-native-reanimated": "~3.6.2",
     "react-native-svg": "^14.1.0",
     "react-native-web": "~0.19.6",
-    "uuid": "^9.0.1",
-    "expo-clipboard": "~5.0.1"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/lodash": "^4.17.4",
     "@types/react": "~18.2.45",
     "@types/uuid": "^9.0.8",
     "eslint": "^8.57.0",

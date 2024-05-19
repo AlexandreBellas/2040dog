@@ -1,8 +1,15 @@
 import { AnimatedView } from '@gluestack-style/animation-resolver'
 import { Text, styled } from '@gluestack-ui/themed'
 import tileColorByValue from '@helpers/tile-color-by-value'
+import usePrevProps from '@hooks/use-prev-props'
+import { IPosition } from '@interfaces/position'
 import { ITile } from '@interfaces/tile'
-import { memo, useEffect, useMemo, useState } from 'react'
+import {
+  combinedAnimationDuration,
+  isNewAnimationDuration,
+  moveAnimationDuration,
+} from '@utils/constants/animation'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 
 import TileImage from './TileImage'
 
@@ -19,9 +26,8 @@ const Tile = (props: Readonly<ITileProps>) => {
   // #endregion
 
   // #region Constant variables
-  const isNewAnimationDuration = 150
-  const combinedAnimationDuration = 100
   const bgColorNull = '$trueGray300'
+  const tileTotalLength = (1 + 16 + 1) * 4
   // #endregion
 
   // #region States
@@ -29,7 +35,7 @@ const Tile = (props: Readonly<ITileProps>) => {
   const [combinedAnimationState, setCombinedAnimationState] = useState(0)
   // #endregion
 
-  // #region Hooks
+  // #region Memos
   const { bgColor, textColor, image } = useMemo(
     () =>
       value
@@ -49,6 +55,17 @@ const Tile = (props: Readonly<ITileProps>) => {
     if (combinedAnimationState === 0) return '100%'
     return combinedAnimationState === 1 ? '115%' : '100%'
   }, [isNewAnimationState, combinedAnimationState])
+  // #endregion
+
+  // #region Prev props
+  const previousPosition = usePrevProps<IPosition>({ i, j })
+  // #endregion
+
+  // #region Callbacks
+  const positionToPixels = useCallback(
+    (position: number) => position * tileTotalLength,
+    [tileTotalLength],
+  )
   // #endregion
 
   // #region Effects
@@ -71,7 +88,9 @@ const Tile = (props: Readonly<ITileProps>) => {
 
   // onCombined
   useEffect(() => {
-    if (hasBeenCombined) setCombinedAnimationState(1)
+    if (hasBeenCombined) {
+      setTimeout(() => setCombinedAnimationState(1), moveAnimationDuration)
+    }
   }, [hasBeenCombined])
 
   // onCombinedAnimation
@@ -95,13 +114,31 @@ const Tile = (props: Readonly<ITileProps>) => {
 
   // #region Styled components
   const AnimatedBox = styled(AnimatedView, {
+    position: 'absolute',
     h: '$16',
     w: '$16',
     margin: '$1',
     backgroundColor: bgColorNull,
-    ':initial': { scale: startScale },
-    ':animate': { scale: stopScale },
+    borderRadius: '$md',
+    ':initial': {
+      x: positionToPixels(previousPosition?.j ?? j),
+      y: positionToPixels(previousPosition?.i ?? i),
+      scale: startScale,
+    },
+    ':animate': {
+      x: positionToPixels(j),
+      y: positionToPixels(i),
+      scale: stopScale,
+    },
     ':transition': {
+      x: {
+        duration: moveAnimationDuration,
+        ease: 'easeIn',
+      },
+      y: {
+        duration: moveAnimationDuration,
+        ease: 'easeIn',
+      },
       scale: {
         duration:
           isNewAnimationState === 1
@@ -119,7 +156,6 @@ const Tile = (props: Readonly<ITileProps>) => {
       <AnimatedBox
         key={`${i}-${j}`}
         backgroundColor={bgColorNull}
-        borderRadius="$md"
         alignItems="center"
         justifyContent="center"
       >
@@ -131,7 +167,6 @@ const Tile = (props: Readonly<ITileProps>) => {
   return (
     <AnimatedBox
       backgroundColor={bgColor}
-      borderRadius="$md"
       alignItems="center"
       justifyContent="center"
     >
