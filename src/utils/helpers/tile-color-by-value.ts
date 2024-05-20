@@ -9,7 +9,7 @@ interface ITileStyle {
   }
 }
 
-const styleMap: Record<number, ITileStyle> = {
+export const styleMap: Record<number, ITileStyle> = {
   2: {
     bgColor: '$coolGray200',
     textColor: '$black',

@@ -1,21 +1,29 @@
-import { Image } from '@gluestack-ui/themed'
 import { memo } from 'react'
+import { Image } from 'react-native'
 
 interface ITileImageProps {
-  source: string
-  alt: string
+  image?: {
+    source: any
+    alt: string
+  }
 }
 
 const TileImage = (props: Readonly<ITileImageProps>) => {
+  // #region Props
+  const { image } = props
+  // #endregion
+
   return (
     <Image
-      borderRadius={8}
-      w="$full"
-      h="$full"
-      position="absolute"
-      opacity="$30"
-      source={props.source}
-      alt={props.alt}
+      source={image?.source}
+      alt={image?.alt}
+      style={{
+        width: '100%',
+        height: '100%',
+        borderRadius: 8,
+        position: 'absolute',
+        opacity: 0.3,
+      }}
     />
   )
 }

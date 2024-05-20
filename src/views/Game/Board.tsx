@@ -1,4 +1,4 @@
-import { View } from '@gluestack-ui/themed'
+import { Box, View } from '@gluestack-ui/themed'
 import { IBoard } from '@interfaces/board'
 
 import Tile from './Tile'
@@ -18,7 +18,7 @@ export default function Board(props: Readonly<IBoardProps>) {
   // #endregion
 
   return (
-    <>
+    <Box height={302}>
       {['bg', 'game'].map((id) => (
         <View
           id={id}
@@ -62,6 +62,6 @@ export default function Board(props: Readonly<IBoardProps>) {
             .flat()}
         </View>
       ))}
-    </>
+    </Box>
   )
 }

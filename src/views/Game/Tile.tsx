@@ -170,7 +170,7 @@ const Tile = (props: Readonly<ITileProps>) => {
       alignItems="center"
       justifyContent="center"
     >
-      {image && <TileImage source={image.source} alt={image.alt} />}
+      <TileImage image={image} />
       <Text
         color={textColor}
         fontSize={value && value >= 1024 ? '$xl' : '$3xl'}

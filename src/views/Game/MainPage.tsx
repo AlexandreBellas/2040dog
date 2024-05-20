@@ -538,7 +538,7 @@ export default function MainPage() {
 
             <GameHeading />
 
-            <Box alignItems="center" width="$full" height={302}>
+            <Box alignItems="center" width="$full">
               {!isMultiplayer ? (
                 <Board board={board} />
               ) : (
