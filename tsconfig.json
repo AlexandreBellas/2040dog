@@ -9,7 +9,9 @@
       "@services/*": ["./src/services/*"],
       "@views/*": ["./src/views/*"],
       "@layouts/*": ["./src/layouts/*"],
-      "@assets/*": ["./assets/*"]
+      "@assets/*": ["./assets/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@hooks/*": ["./src/hooks/*"],
     }
   },
   "include": ["**/*.ts", "**/*.tsx"]

@@ -2,9 +2,9 @@ import { IBoard } from '@interfaces/board'
 import { IDirection } from '@interfaces/direction'
 import { IMove } from '@interfaces/move'
 import { IPosition } from '@interfaces/position'
-import { ITile } from '@interfaces/tile'
 import BoardDatabaseService from '@services/database/board.database'
 import React, { createContext, useContext, useReducer } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 // #region Context types
 interface IBoardProviderProps {
@@ -36,6 +36,9 @@ type IBoardContextAction =
   | {
       type: 'restart'
     }
+  | {
+      type: 'clean-up'
+    }
 // #endregion
 
 // #region Constant variables
@@ -44,50 +47,49 @@ const boardLength = 4
 
 // #region Functions
 function createNewBoard() {
-  const tiles: ITile[][] = []
+  const tiles: IBoard['tiles'] = []
   for (let i = 0; i < boardLength; i++) {
     tiles.push([])
     for (let j = 0; j < boardLength; j++) {
-      tiles[i].push({ value: null, isCombined: false, isNew: false })
+      tiles[i].push(null)
     }
   }
   return { tiles } as IBoard
 }
 
-function createTestBoard() {
+function createTestBoard(): IBoard {
   return {
     tiles: [
       [
-        { value: 2, isCombined: false },
-        { value: 4, isCombined: false },
-        { value: 8, isCombined: false },
-        { value: 16, isCombined: false },
+        { value: 2, isCombined: false, isNew: false, ids: [uuidv4()] },
+        { value: 4, isCombined: false, isNew: false, ids: [uuidv4()] },
+        { value: 8, isCombined: false, isNew: false, ids: [uuidv4()] },
+        { value: 16, isCombined: false, isNew: false, ids: [uuidv4()] },
       ],
       [
-        { value: 32, isCombined: false },
-        { value: 64, isCombined: false },
-        { value: 128, isCombined: false },
-        { value: 256, isCombined: false },
+        { value: 32, isCombined: false, isNew: false, ids: [uuidv4()] },
+        { value: 64, isCombined: false, isNew: false, ids: [uuidv4()] },
+        { value: 128, isCombined: false, isNew: false, ids: [uuidv4()] },
+        { value: 256, isCombined: false, isNew: false, ids: [uuidv4()] },
       ],
       [
-        { value: 512, isCombined: false },
-        { value: 1024, isCombined: false },
-        { value: 2048, isCombined: false },
-        { value: null, isCombined: false },
+        { value: 512, isCombined: false, isNew: false, ids: [uuidv4()] },
+        { value: 1024, isCombined: false, isNew: false, ids: [uuidv4()] },
+        { value: 2048, isCombined: false, isNew: false, ids: [uuidv4()] },
+        null,
       ],
-      [
-        { value: null, isCombined: false },
-        { value: null, isCombined: false },
-        { value: null, isCombined: false },
-        { value: null, isCombined: false },
-      ],
+      [null, null, null, null],
     ],
-  } as IBoard
+  }
 }
 
 function deepCopyBoard(board: IBoard): IBoard {
   return {
-    tiles: [...board.tiles.map((row) => [...row.map((tile) => ({ ...tile }))])],
+    tiles: [
+      ...board.tiles.map((row) => [
+        ...row.map((tile) => (tile === null ? null : { ...tile })),
+      ]),
+    ],
   }
 }
 
@@ -97,7 +99,7 @@ function listEmptySpots(board: IBoard) {
 
   tiles.forEach((row, i) =>
     row.forEach((tile, j) => {
-      if (tile.value === null) {
+      if (tile === null) {
         emptySpots.push({ i, j })
       }
     }),
@@ -117,8 +119,12 @@ function insertRandomTile(board: IBoard) {
   const randomSpotIndex = Math.floor(Math.random() * emptySpots.length)
   const randomSpot = emptySpots[randomSpotIndex]
 
-  board.tiles[randomSpot.i][randomSpot.j].value = newRandomTileValue()
-  board.tiles[randomSpot.i][randomSpot.j].isNew = true
+  board.tiles[randomSpot.i][randomSpot.j] = {
+    value: newRandomTileValue(),
+    isNew: true,
+    isCombined: false,
+    ids: [uuidv4()],
+  }
 
   return board
 }
@@ -128,7 +134,7 @@ function getTile(board: IBoard, position: IPosition) {
 }
 
 function isBoardFull(board: IBoard) {
-  return board.tiles.every((row) => row.every((tile) => tile.value !== null))
+  return board.tiles.every((row) => row.every((tile) => tile !== null))
 }
 
 function isPossibleToMove(board: IBoard) {
@@ -137,10 +143,10 @@ function isPossibleToMove(board: IBoard) {
     board.tiles.some((row, i, tiles) =>
       row.some((tile, j) => {
         return (
-          (i > 0 && tiles[i - 1][j].value === tile.value) ||
-          (i < boardLength - 1 && tiles[i + 1][j].value === tile.value) ||
-          (j > 0 && tiles[i][j - 1].value === tile.value) ||
-          (j < boardLength - 1 && tiles[i][j + 1].value === tile.value)
+          (i > 0 && tiles[i - 1][j]!.value === tile!.value) ||
+          (i < boardLength - 1 && tiles[i + 1][j]!.value === tile!.value) ||
+          (j > 0 && tiles[i][j - 1]!.value === tile!.value) ||
+          (j < boardLength - 1 && tiles[i][j + 1]!.value === tile!.value)
         )
       }),
     )
@@ -148,14 +154,17 @@ function isPossibleToMove(board: IBoard) {
 }
 
 function doesBoardHave2048(board: IBoard) {
-  return board.tiles.some((row) => row.some((tile) => tile.value === 2048))
+  return board.tiles.some((row) => row.some((tile) => tile?.value === 2048))
 }
 
 function resetCombinedAndNewStates(board: IBoard) {
   board.tiles.forEach((row) => {
-    row.forEach((_, idx, arr) => {
-      arr[idx].isCombined = false
-      arr[idx].isNew = false
+    row.forEach((item) => {
+      if (item !== null) {
+        item.isCombined = false
+        item.isNew = false
+        item.ids = [item.ids[0]]
+      }
     })
   })
 
@@ -169,29 +178,30 @@ function move(board: IBoard, direction: IDirection): IMove[] {
     case 'up': {
       board.tiles.forEach((row, i, tiles) =>
         row.forEach((tile, j) => {
-          if (i === 0 || tile.value === null) return
+          if (i === 0 || tile === null) return
 
           let nextI = i
-          while (nextI > 0 && tiles[nextI - 1][j].value === null) {
+          while (nextI > 0 && tiles[nextI - 1][j] === null) {
             nextI--
           }
 
           if (
             nextI > 0 &&
-            tiles[nextI - 1][j].value === tile.value &&
-            !tiles[nextI - 1][j].isCombined
+            tiles[nextI - 1][j]!.value === tile.value &&
+            !tiles[nextI - 1][j]!.isCombined
           ) {
             tiles[nextI - 1][j] = {
               value: tile.value * 2,
               isCombined: true,
               isNew: false,
+              ids: [tiles[nextI - 1][j]!.ids[0], tile.ids[0]],
             }
           } else {
             if (nextI === i) return
             tiles[nextI][j] = { ...tile }
           }
 
-          tiles[i][j] = { value: null, isCombined: false, isNew: false }
+          tiles[i][j] = null
 
           moves.push({
             previous: { i, j },
@@ -212,32 +222,30 @@ function move(board: IBoard, direction: IDirection): IMove[] {
         const row = board.tiles[i]
 
         return row.forEach((tile, j) => {
-          if (i === boardLength - 1 || tile.value === null) return
+          if (i === boardLength - 1 || tile === null) return
 
           let nextI = i
-          while (
-            nextI < boardLength - 1 &&
-            tiles[nextI + 1][j].value === null
-          ) {
+          while (nextI < boardLength - 1 && tiles[nextI + 1][j] === null) {
             nextI++
           }
 
           if (
             nextI < boardLength - 1 &&
-            tiles[nextI + 1][j].value === tile.value &&
-            !tiles[nextI + 1][j].isCombined
+            tiles[nextI + 1][j]!.value === tile.value &&
+            !tiles[nextI + 1][j]!.isCombined
           ) {
             tiles[nextI + 1][j] = {
               value: tile.value * 2,
               isCombined: true,
               isNew: false,
+              ids: [tiles[nextI + 1][j]!.ids[0], tile.ids[0]],
             }
           } else {
             if (nextI === i) return
             tiles[nextI][j] = { ...tile }
           }
 
-          tiles[i][j] = { value: null, isCombined: false, isNew: false }
+          tiles[i][j] = null
 
           moves.push({
             previous: { i, j },
@@ -251,29 +259,30 @@ function move(board: IBoard, direction: IDirection): IMove[] {
     case 'left': {
       board.tiles.forEach((row, i, tiles) =>
         row.forEach((tile, j) => {
-          if (j === 0 || tile.value === null) return
+          if (j === 0 || tile === null) return
 
           let nextJ = j
-          while (nextJ > 0 && tiles[i][nextJ - 1].value === null) {
+          while (nextJ > 0 && tiles[i][nextJ - 1] === null) {
             nextJ--
           }
 
           if (
             nextJ > 0 &&
-            tiles[i][nextJ - 1].value === tile.value &&
-            !tiles[i][nextJ - 1].isCombined
+            tiles[i][nextJ - 1]!.value === tile.value &&
+            !tiles[i][nextJ - 1]!.isCombined
           ) {
             tiles[i][nextJ - 1] = {
               value: tile.value * 2,
               isCombined: true,
               isNew: false,
+              ids: [tiles[i][nextJ - 1]!.ids[0], tile.ids[0]],
             }
           } else {
             if (nextJ === j) return
             tiles[i][nextJ] = { ...tile }
           }
 
-          tiles[i][j] = { value: null, isCombined: false, isNew: false }
+          tiles[i][j] = null
 
           moves.push({
             previous: { i, j },
@@ -292,29 +301,30 @@ function move(board: IBoard, direction: IDirection): IMove[] {
 
         return reversedIndexes.forEach((j) => {
           const tile = tiles[i][j]
-          if (j === boardLength - 1 || tile.value === null) return
+          if (j === boardLength - 1 || tile === null) return
 
           let nextJ = j
-          while (nextJ < boardLength - 1 && tiles[i][nextJ + 1].value == null) {
+          while (nextJ < boardLength - 1 && tiles[i][nextJ + 1] == null) {
             nextJ++
           }
 
           if (
             nextJ < boardLength - 1 &&
-            tiles[i][nextJ + 1].value === tile.value &&
-            !tiles[i][nextJ + 1].isCombined
+            tiles[i][nextJ + 1]!.value === tile.value &&
+            !tiles[i][nextJ + 1]!.isCombined
           ) {
             tiles[i][nextJ + 1] = {
               value: tile.value * 2,
               isCombined: true,
               isNew: false,
+              ids: [tiles[i][nextJ + 1]!.ids[0], tile.ids[0]],
             }
           } else {
             if (nextJ === j) return
             tiles[i][nextJ] = { ...tile }
           }
 
-          tiles[i][j] = { value: null, isCombined: false, isNew: false }
+          tiles[i][j] = null
 
           moves.push({
             previous: { i, j },
@@ -333,8 +343,7 @@ function move(board: IBoard, direction: IDirection): IMove[] {
 function findGreatestTileValue(board: IBoard): number {
   return board.tiles.reduce((prevGreatest, currRow) => {
     const greatestInRow = currRow.reduce(
-      (prev, curr) =>
-        curr.value !== null && curr.value > prev ? curr.value : prev,
+      (prev, curr) => (curr !== null && curr.value > prev ? curr.value : prev),
       0,
     )
 
@@ -348,7 +357,7 @@ function countPointsOfCombined(board: IBoard): number {
       prevTotalSum +
       currRow.reduce(
         (prev, curr) =>
-          prev + (curr.isCombined && curr.value !== null ? curr.value : 0),
+          prev + (curr !== null && curr.isCombined ? curr.value : 0),
         0,
       ),
     0,
@@ -467,6 +476,7 @@ function BoardReducer(
       }
     }
     default: {
+      // includes 'clean-up'
       return state
     }
   }

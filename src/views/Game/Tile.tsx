@@ -1,27 +1,33 @@
 import { AnimatedView } from '@gluestack-style/animation-resolver'
-import { Box, Text, styled } from '@gluestack-ui/themed'
+import { Text, styled } from '@gluestack-ui/themed'
 import tileColorByValue from '@helpers/tile-color-by-value'
-import { memo, useEffect, useMemo, useState } from 'react'
+import usePrevProps from '@hooks/use-prev-props'
+import { IPosition } from '@interfaces/position'
+import { ITile } from '@interfaces/tile'
+import {
+  combinedAnimationDuration,
+  isNewAnimationDuration,
+  moveAnimationDuration,
+} from '@utils/constants/animation'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 
 import TileImage from './TileImage'
 
 interface ITileProps {
   i: number
   j: number
-  value?: number | null
-  hasBeenCombined: boolean
-  isNew: boolean
+  tile: ITile
 }
 
 const Tile = (props: Readonly<ITileProps>) => {
   // #region Props
-  const { value, hasBeenCombined, isNew, i, j } = props
+  const { tile, i, j } = props
+  const { isCombined: hasBeenCombined, isNew, value } = tile
   // #endregion
 
   // #region Constant variables
-  const isNewAnimationDuration = 150
-  const combinedAnimationDuration = 100
   const bgColorNull = '$trueGray300'
+  const tileTotalLength = (1 + 16 + 1) * 4
   // #endregion
 
   // #region States
@@ -29,7 +35,7 @@ const Tile = (props: Readonly<ITileProps>) => {
   const [combinedAnimationState, setCombinedAnimationState] = useState(0)
   // #endregion
 
-  // #region Hooks
+  // #region Memos
   const { bgColor, textColor, image } = useMemo(
     () =>
       value
@@ -49,6 +55,17 @@ const Tile = (props: Readonly<ITileProps>) => {
     if (combinedAnimationState === 0) return '100%'
     return combinedAnimationState === 1 ? '115%' : '100%'
   }, [isNewAnimationState, combinedAnimationState])
+  // #endregion
+
+  // #region Prev props
+  const previousPosition = usePrevProps<IPosition>({ i, j })
+  // #endregion
+
+  // #region Callbacks
+  const positionToPixels = useCallback(
+    (position: number) => position * tileTotalLength,
+    [tileTotalLength],
+  )
   // #endregion
 
   // #region Effects
@@ -71,7 +88,9 @@ const Tile = (props: Readonly<ITileProps>) => {
 
   // onCombined
   useEffect(() => {
-    if (hasBeenCombined) setCombinedAnimationState(1)
+    if (hasBeenCombined) {
+      setTimeout(() => setCombinedAnimationState(1), moveAnimationDuration)
+    }
   }, [hasBeenCombined])
 
   // onCombinedAnimation
@@ -95,14 +114,31 @@ const Tile = (props: Readonly<ITileProps>) => {
 
   // #region Styled components
   const AnimatedBox = styled(AnimatedView, {
-    minHeight: '$16',
-    minWidth: '$16',
-    maxHeight: '$80',
-    maxWidth: '$80',
+    position: 'absolute',
+    h: '$16',
+    w: '$16',
+    margin: '$1',
     backgroundColor: bgColorNull,
-    ':initial': { scale: startScale },
-    ':animate': { scale: stopScale },
+    borderRadius: '$md',
+    ':initial': {
+      x: positionToPixels(previousPosition?.j ?? j),
+      y: positionToPixels(previousPosition?.i ?? i),
+      scale: startScale,
+    },
+    ':animate': {
+      x: positionToPixels(j),
+      y: positionToPixels(i),
+      scale: stopScale,
+    },
     ':transition': {
+      x: {
+        duration: moveAnimationDuration,
+        ease: 'easeIn',
+      },
+      y: {
+        duration: moveAnimationDuration,
+        ease: 'easeIn',
+      },
       scale: {
         duration:
           isNewAnimationState === 1
@@ -117,49 +153,48 @@ const Tile = (props: Readonly<ITileProps>) => {
 
   if (isNew && isNewAnimationState === 0) {
     return (
-      <Box backgroundColor={bgColorNull} borderRadius="$md">
-        <AnimatedBox
-          key={`${i}-${j}`}
-          backgroundColor={bgColorNull}
-          borderRadius="$md"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Text />
-        </AnimatedBox>
-      </Box>
+      <AnimatedBox
+        key={`${i}-${j}`}
+        backgroundColor={bgColorNull}
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Text />
+      </AnimatedBox>
     )
   }
 
   return (
-    <Box backgroundColor={bgColorNull} borderRadius="$md">
-      <AnimatedBox
-        key={`${i}-${j}`}
-        backgroundColor={bgColor}
-        borderRadius="$md"
-        alignItems="center"
-        justifyContent="center"
+    <AnimatedBox
+      backgroundColor={bgColor}
+      alignItems="center"
+      justifyContent="center"
+    >
+      <TileImage image={image} />
+      <Text
+        color={textColor}
+        fontSize={value && value >= 1024 ? '$xl' : '$3xl'}
+        fontWeight="$bold"
       >
-        {image && <TileImage source={image.source} alt={image.alt} />}
-        <Text
-          color={textColor}
-          fontSize={value && value >= 1024 ? '$xl' : '$3xl'}
-          fontWeight="$bold"
-        >
-          {value}
-        </Text>
-      </AnimatedBox>
-    </Box>
+        {value}
+      </Text>
+    </AnimatedBox>
   )
 }
 
 export default memo(Tile, (prev, next) => {
-  if (prev.isNew && !next.isNew && prev.value === next.value) return true
+  if (
+    prev.tile.isNew &&
+    !next.tile.isNew &&
+    prev.tile.value === next.tile.value
+  ) {
+    return true
+  }
 
   return (
-    prev.hasBeenCombined === next.hasBeenCombined &&
-    prev.value === next.value &&
-    prev.isNew === next.isNew &&
+    prev.tile.isCombined === next.tile.isCombined &&
+    prev.tile.value === next.tile.value &&
+    prev.tile.isNew === next.tile.isNew &&
     prev.i === next.i &&
     prev.j === next.j
   )
