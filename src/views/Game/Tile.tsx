@@ -6,10 +6,12 @@ import { IPosition } from '@interfaces/position'
 import { ITile } from '@interfaces/tile'
 import {
   combinedAnimationDuration,
+  expandTileOnWinMomentAnimationDuration,
   isNewAnimationDuration,
   moveAnimationDuration,
 } from '@utils/constants/animation'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { TouchableOpacity } from 'react-native'
 
 import TileImage from './TileImage'
 
@@ -19,9 +21,8 @@ interface ITileProps {
   tile: ITile
 }
 
-const Tile = (props: Readonly<ITileProps>) => {
+const Tile = ({ tile, i, j }: Readonly<ITileProps>) => {
   // #region Props
-  const { tile, i, j } = props
   const { isCombined: hasBeenCombined, isNew, value } = tile
   // #endregion
 
@@ -33,6 +34,7 @@ const Tile = (props: Readonly<ITileProps>) => {
   // #region States
   const [isNewAnimationState, setIsNewAnimationState] = useState(0)
   const [combinedAnimationState, setCombinedAnimationState] = useState(0)
+  const [hasDismissedWin, setHasDismissedWin] = useState(false)
   // #endregion
 
   // #region Memos
@@ -44,17 +46,25 @@ const Tile = (props: Readonly<ITileProps>) => {
     [value],
   )
   const startScale = useMemo(() => {
+    if (value === 2048) return hasDismissedWin ? '400%' : '100%'
     if (isNewAnimationState === 1) return '0%'
 
     if (combinedAnimationState === 0) return '100%'
     return combinedAnimationState === 1 ? '100%' : '115%'
-  }, [isNewAnimationState, combinedAnimationState])
+  }, [value, hasDismissedWin, isNewAnimationState, combinedAnimationState])
   const stopScale = useMemo(() => {
+    if (value === 2048) return hasDismissedWin ? '100%' : '400%'
     if (isNewAnimationState === 1) return '100%'
 
     if (combinedAnimationState === 0) return '100%'
     return combinedAnimationState === 1 ? '115%' : '100%'
-  }, [isNewAnimationState, combinedAnimationState])
+  }, [value, hasDismissedWin, isNewAnimationState, combinedAnimationState])
+
+  const positionTransitionDuration = useMemo(() => {
+    return tile.value === 2048
+      ? expandTileOnWinMomentAnimationDuration
+      : moveAnimationDuration
+  }, [tile])
   // #endregion
 
   // #region Prev props
@@ -126,26 +136,34 @@ const Tile = (props: Readonly<ITileProps>) => {
       scale: startScale,
     },
     ':animate': {
-      x: positionToPixels(j),
-      y: positionToPixels(i),
+      x:
+        tile.value === 2048 && !hasDismissedWin
+          ? 1.5 * tileTotalLength
+          : positionToPixels(j),
+      y:
+        tile.value === 2048 && !hasDismissedWin
+          ? 1.5 * tileTotalLength
+          : positionToPixels(i),
       scale: stopScale,
     },
     ':transition': {
       x: {
-        duration: moveAnimationDuration,
+        duration: positionTransitionDuration,
         ease: 'easeIn',
       },
       y: {
-        duration: moveAnimationDuration,
+        duration: positionTransitionDuration,
         ease: 'easeIn',
       },
       scale: {
         duration:
-          isNewAnimationState === 1
-            ? isNewAnimationDuration
-            : combinedAnimationDuration,
+          tile.value === 2048
+            ? expandTileOnWinMomentAnimationDuration
+            : isNewAnimationState === 1
+              ? isNewAnimationDuration
+              : combinedAnimationDuration,
         type: 'linear',
-        ease: 'easeOut',
+        ease: tile.value === 2048 ? 'easeIn' : 'easeOut',
       },
     },
   })
@@ -165,20 +183,27 @@ const Tile = (props: Readonly<ITileProps>) => {
   }
 
   return (
-    <AnimatedBox
-      backgroundColor={bgColor}
-      alignItems="center"
-      justifyContent="center"
+    <TouchableOpacity
+      disabled={value !== 2048 || hasDismissedWin}
+      onPress={() => {
+        setHasDismissedWin(true)
+      }}
     >
-      <TileImage image={image} />
-      <Text
-        color={textColor}
-        fontSize={value && value >= 1024 ? '$xl' : '$3xl'}
-        fontWeight="$bold"
+      <AnimatedBox
+        backgroundColor={bgColor}
+        alignItems="center"
+        justifyContent="center"
       >
-        {value}
-      </Text>
-    </AnimatedBox>
+        <TileImage image={image} />
+        <Text
+          color={textColor}
+          fontSize={value && value >= 1024 ? '$xl' : '$3xl'}
+          fontWeight="$bold"
+        >
+          {value}
+        </Text>
+      </AnimatedBox>
+    </TouchableOpacity>
   )
 }
 

@@ -404,7 +404,9 @@ export default function MainPage() {
     setTimeout(() => {
       if (hasWon) {
         if (Platform.OS === 'web') {
-          alert('Congratulations! ❤️ You deserve 2040 lickisses 🐶')
+          setTimeout(() => {
+            alert('Congratulations! ❤️ You deserve 2040 lickisses 🐶')
+          }, 1000)
           return
         }
 
@@ -496,14 +498,14 @@ export default function MainPage() {
             sx={{
               ...(isBrowser
                 ? {
-                    shadowColor: '$black',
-                    shadowOffset: {
-                      height: 2,
-                      width: 1,
-                    },
-                    shadowRadius: '$1',
-                    shadowOpacity: 0.4,
-                  }
+                  shadowColor: '$black',
+                  shadowOffset: {
+                    height: 2,
+                    width: 1,
+                  },
+                  shadowRadius: '$1',
+                  shadowOpacity: 0.4,
+                }
                 : {}),
             }}
           >

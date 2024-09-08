@@ -27,18 +27,18 @@ interface IBoardContextState {
 
 type IBoardContextAction =
   | {
-      type: 'move'
-      direction: IDirection
-    }
+    type: 'move'
+    direction: IDirection
+  }
   | {
-      type: 'insert'
-    }
+    type: 'insert'
+  }
   | {
-      type: 'restart'
-    }
+    type: 'restart'
+  }
   | {
-      type: 'clean-up'
-    }
+    type: 'clean-up'
+  }
 // #endregion
 
 // #region Constant variables
