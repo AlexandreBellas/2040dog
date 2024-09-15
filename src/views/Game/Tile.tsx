@@ -131,8 +131,14 @@ const Tile = ({ tile, i, j }: Readonly<ITileProps>) => {
     backgroundColor: bgColorNull,
     borderRadius: '$md',
     ':initial': {
-      x: positionToPixels(previousPosition?.j ?? j),
-      y: positionToPixels(previousPosition?.i ?? i),
+      x:
+        tile.value === 2048 && hasDismissedWin
+          ? 1.5 * tileTotalLength
+          : positionToPixels(previousPosition?.j ?? j),
+      y:
+        tile.value === 2048 && hasDismissedWin
+          ? 1.5 * tileTotalLength
+          : positionToPixels(previousPosition?.i ?? i),
       scale: startScale,
     },
     ':animate': {
@@ -176,6 +182,7 @@ const Tile = ({ tile, i, j }: Readonly<ITileProps>) => {
         backgroundColor={bgColorNull}
         alignItems="center"
         justifyContent="center"
+        zIndex={value === 2048 ? 100 : 0}
       >
         <Text />
       </AnimatedBox>
@@ -188,6 +195,7 @@ const Tile = ({ tile, i, j }: Readonly<ITileProps>) => {
       onPress={() => {
         setHasDismissedWin(true)
       }}
+      style={{ zIndex: value === 2048 ? 100 : 0 }}
     >
       <AnimatedBox
         backgroundColor={bgColor}
